@@ -1,5 +1,7 @@
 package yanzhikai.simpleplayer.event;
 
+import yanzhikai.simpleplayer.model.AudioInfo;
+
 /**
  * author : yany
  * e-mail : yanzhikai_yjk@qq.com
@@ -15,4 +17,14 @@ public class AudioEvent {
     public static final int AUDIO_NEXT = 4;
 
     public int type = AUDIO_NULL;
+
+    private AudioInfo audioInfo;
+
+    public void setAudioInfo(AudioInfo audioInfo) {
+        this.audioInfo = audioInfo;
+    }
+
+    public AudioInfo getAudioInfo() {
+        return audioInfo;
+    }
 }

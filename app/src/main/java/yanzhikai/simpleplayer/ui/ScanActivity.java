@@ -11,10 +11,11 @@ import android.widget.ProgressBar;
 
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.model.AudioInfo;
+import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.utils.MediaUtil;
 
 public class ScanActivity extends Activity {
-    public static final String TAG = "ScanActivity";
+    public static final String TAG = "yjkScanActivity";
     private Button btn_scan;
     private ProgressBar pb_scan;
 
@@ -58,6 +59,7 @@ public class ScanActivity extends Activity {
 
                         if (audioInfo != null) {
                             Log.d(TAG, "audioInfo: " + audioInfo.toString());
+                            PlayList.getInstance().add(audioInfo);
                         }
 
                         mHandler.sendEmptyMessage(SCANING);
