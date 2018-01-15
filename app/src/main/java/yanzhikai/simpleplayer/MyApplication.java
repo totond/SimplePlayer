@@ -2,10 +2,8 @@ package yanzhikai.simpleplayer;
 
 import android.app.Application;
 
-import java.util.ArrayList;
-
-import yanzhikai.simpleplayer.model.AudioInfo;
-import yanzhikai.simpleplayer.model.PlayList;
+import yanzhikai.simpleplayer.db.LocalAudioDaoManager;
+import yanzhikai.simpleplayer.db.PlayListAudioDaoManager;
 
 /**
  * author : yany
@@ -16,9 +14,21 @@ import yanzhikai.simpleplayer.model.PlayList;
 
 public class MyApplication extends Application {
 
+
     @Override
     public void onCreate() {
         super.onCreate();
+        init();
+    }
+
+    private void init(){
+        LocalAudioDaoManager.getInstance().init(getApplicationContext());
+        PlayListAudioDaoManager.getInstance().init(getApplicationContext());
+    }
+
+    public static void closeDB(){
+        LocalAudioDaoManager.getInstance().closeConnection();
+        PlayListAudioDaoManager.getInstance().closeConnection();
     }
 
 

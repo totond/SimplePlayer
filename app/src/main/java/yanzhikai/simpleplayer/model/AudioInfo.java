@@ -1,14 +1,21 @@
 package yanzhikai.simpleplayer.model;
 
+import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
+import org.greenrobot.greendao.annotation.Unique;
+
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by zhangliangming on 2017/8/4.
  */
+@Entity(nameInDb = "AudioInfo")
 public class AudioInfo implements Serializable {
 
     public static final String KEY = "com.zlm.hp.ai.key";
 
+    private static final long serialVersionUID = 42L;
 
     /**
      * 状态
@@ -33,6 +40,10 @@ public class AudioInfo implements Serializable {
     public static final int LIKE_LOCAL = 5;
     public static final int LIKE_NET = 6;
 
+    @Id(autoincrement = true)
+    private Long _id;
+
+
     /**
      * 歌曲名称
      */
@@ -44,6 +55,7 @@ public class AudioInfo implements Serializable {
     /**
      *
      */
+    @Unique
     private String hash;
     /**
      * 歌曲后缀名
@@ -91,6 +103,30 @@ public class AudioInfo implements Serializable {
 
     public AudioInfo() {
 
+    }
+
+    @Generated(hash = 1838736429)
+    public AudioInfo(Long _id, String songName, String singerName, String hash,
+            String fileExt, long fileSize, String fileSizeText, String filePath,
+            long duration, String durationText, String downloadUrl,
+            String createTime, int status, int type, String category,
+            String childCategory) {
+        this._id = _id;
+        this.songName = songName;
+        this.singerName = singerName;
+        this.hash = hash;
+        this.fileExt = fileExt;
+        this.fileSize = fileSize;
+        this.fileSizeText = fileSizeText;
+        this.filePath = filePath;
+        this.duration = duration;
+        this.durationText = durationText;
+        this.downloadUrl = downloadUrl;
+        this.createTime = createTime;
+        this.status = status;
+        this.type = type;
+        this.category = category;
+        this.childCategory = childCategory;
     }
 
     public String getSongName() {
@@ -232,5 +268,13 @@ public class AudioInfo implements Serializable {
                 ", category='" + category + '\'' +
                 ", childCategory='" + childCategory + '\'' +
                 '}';
+    }
+
+    public Long get_id() {
+        return this._id;
+    }
+
+    public void set_id(Long _id) {
+        this._id = _id;
     }
 }

@@ -10,8 +10,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import yanzhikai.simpleplayer.R;
+import yanzhikai.simpleplayer.db.LocalAudioDaoManager;
 import yanzhikai.simpleplayer.model.AudioInfo;
-import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.utils.MediaUtil;
 
 public class ScanActivity extends Activity {
@@ -59,7 +59,8 @@ public class ScanActivity extends Activity {
 
                         if (audioInfo != null) {
                             Log.d(TAG, "audioInfo: " + audioInfo.toString());
-                            PlayList.getInstance().add(audioInfo);
+//                            PlayList.getInstance().add(audioInfo);
+                            LocalAudioDaoManager.getInstance().insertAudio(audioInfo);
                         }
 
                         mHandler.sendEmptyMessage(SCANING);
@@ -67,7 +68,7 @@ public class ScanActivity extends Activity {
 
                     @Override
                     public boolean filter(String hash) {
-                        return isExist();
+                        return isExist(hash);
                     }
                 });
                 mHandler.sendEmptyMessage(FINISH);
@@ -77,8 +78,8 @@ public class ScanActivity extends Activity {
 
     }
 
-    private boolean isExist(){
-        return false;
+    private boolean isExist(String hash){
+        return LocalAudioDaoManager.getInstance().isExist(hash);
     }
 
     private class ScanHandler extends Handler{
@@ -95,7 +96,7 @@ public class ScanActivity extends Activity {
                     break;
                 case FINISH:
 //                    showFinishView();
-                    Log.d(TAG, "handleMessage: ");
+                    Log.d(TAG, "handleMessage: FINISH");
                     pb_scan.setVisibility(View.INVISIBLE);
                     break;
 

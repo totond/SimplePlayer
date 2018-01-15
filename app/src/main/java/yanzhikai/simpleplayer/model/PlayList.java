@@ -2,7 +2,10 @@ package yanzhikai.simpleplayer.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
+
+import yanzhikai.simpleplayer.db.PlayListAudioDaoManager;
 
 /**
  * author : yany
@@ -24,7 +27,11 @@ public class PlayList {
     private ArrayList<AudioInfo> mAudioList;
 
     private PlayList(){
-        mAudioList = new ArrayList<>();
+        initData();
+    }
+
+    private void initData() {
+        mAudioList = new ArrayList<>(PlayListAudioDaoManager.getInstance().queryAllAudio());
     }
 
     private static final PlayList instance = new PlayList();
@@ -33,29 +40,56 @@ public class PlayList {
         return instance;
     }
 
-    public void add(AudioInfo... infos){
-        mAudioList.addAll(Arrays.asList(infos));
-    }
-
-    public void add(int index, AudioInfo... infos){
-        for (AudioInfo info : infos){
-            mAudioList.add(index,info);
+    public void add(AudioInfo info){
+        if (!isExist(info)) {
+            mAudioList.add(info);
+            PlayListAudioDaoManager.getInstance().insertAudio(info);
         }
     }
 
+//    public void add(int index, AudioInfo... infos){
+//        for (AudioInfo info : infos){
+//            mAudioList.add(index,info);
+//        }
+//    }
+
+    public void add(List<AudioInfo> infos) {
+        for (AudioInfo info : infos){
+            if (!isExist(info)){
+                mAudioList.addAll(infos);
+                PlayListAudioDaoManager.getInstance().insertAudio(info);
+            }
+        }
+
+    }
+
     public boolean remove(AudioInfo info){
-        return mAudioList.remove(info);
+        if (!isExist(info)) {
+            PlayListAudioDaoManager.getInstance().deleteAudio(info);
+            return mAudioList.remove(info);
+        }
+        return false;
     }
 
     public void remove(int index){
-        mAudioList.remove(index);
+        AudioInfo audioInfo = mAudioList.get(index);
+        if (!isExist(audioInfo)) {
+            PlayListAudioDaoManager.getInstance().deleteAudio(audioInfo);
+            mAudioList.remove(index);
+        }
     }
 
     public void clear(){
         mAudioList.clear();
+        PlayListAudioDaoManager.getInstance().deleteAll();
     }
 
-    public void update(){
+    public Boolean isExist(AudioInfo info){
+        return PlayListAudioDaoManager.getInstance().isExist(info.getHash());
+    }
+
+    private void setCurrentAudio(AudioInfo audioInfo){
+        mCurrentAudio = audioInfo;
 
     }
 
@@ -104,4 +138,6 @@ public class PlayList {
     public void setCurrentIndex(int currentIndex) {
         this.mCurrentIndex = currentIndex;
     }
+
+
 }

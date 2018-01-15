@@ -15,6 +15,8 @@ import org.greenrobot.eventbus.Subscribe;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import yanzhikai.simpleplayer.adapter.PlayListAdapter;
+import yanzhikai.simpleplayer.db.LocalAudioDaoManager;
+import yanzhikai.simpleplayer.db.PlayListAudioDaoManager;
 import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.PlayList;
@@ -56,12 +58,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         rv_play_list = findViewById(R.id.rv_play_list);
         rv_play_list.setLayoutManager(new LinearLayoutManager(this));
-        mPlayListAdapter = new PlayListAdapter(this,PlayList.getInstance().getAudioList());
+        mPlayListAdapter = new PlayListAdapter(this, PlayList.getInstance().getAudioList());
         rv_play_list.setAdapter(mPlayListAdapter);
 
     }
 
     private void updateList(){
+        PlayList.getInstance().add(LocalAudioDaoManager.getInstance().queryAllAudio());
+//        PlayListAudioDaoManager.getInstance().insertMultiAudio(LocalAudioDaoManager.getInstance().queryAllAudio());
         mPlayListAdapter.notifyDataSetChanged();
     }
 
