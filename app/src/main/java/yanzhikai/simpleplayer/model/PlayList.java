@@ -56,7 +56,7 @@ public class PlayList {
     public void add(List<AudioInfo> infos) {
         for (AudioInfo info : infos){
             if (!isExist(info)){
-                mAudioList.addAll(infos);
+                mAudioList.add(info);
                 PlayListAudioDaoManager.getInstance().insertAudio(info);
             }
         }
@@ -89,6 +89,10 @@ public class PlayList {
     }
 
     private void setCurrentAudio(AudioInfo audioInfo){
+        PlayingAudioInfo playingAudioInfo = new PlayingAudioInfo(audioInfo);
+        playingAudioInfo.setCurrentTime(0);
+        playingAudioInfo.setCurrentTimeText("00:00");
+        PlayListAudioDaoManager.getInstance().setPlayingAudio(playingAudioInfo);
         mCurrentAudio = audioInfo;
 
     }
@@ -99,9 +103,13 @@ public class PlayList {
             case PLAY_ORDER:
                 nextIndex = mCurrentIndex + 1;
                 if (nextIndex > mAudioList.size()){
-                    mCurrentAudio = null;
+                    if (nextIndex == 1) {
+                        mCurrentAudio = null;
+                    }else {
+                        mCurrentAudio = mAudioList.get(0);
+                    }
                 }else {
-                    mCurrentAudio = mAudioList.get(nextIndex);
+                    setCurrentAudio(mAudioList.get(nextIndex));
                 }
                 break;
             case PLAY_RANDOM:
@@ -110,7 +118,7 @@ public class PlayList {
                 while (nextIndex == mCurrentIndex){
                     nextIndex = random.nextInt(mAudioList.size());
                 }
-                mCurrentAudio = mAudioList.get(nextIndex);
+                setCurrentAudio(mAudioList.get(nextIndex));
                 break;
             case PLAY_SINGLE:
                 mCurrentAudio = mAudioList.get(mCurrentIndex);

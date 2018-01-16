@@ -4,14 +4,16 @@ import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 import android.util.Log;
 
+import com.jian.greendao.gen.AudioInfoDao;
+import com.jian.greendao.gen.DaoMaster;
+import com.jian.greendao.gen.DaoSession;
+
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.List;
 
 import yanzhikai.simpleplayer.model.AudioInfo;
-import yanzhikai.simpleplayer.model.AudioInfoDao;
-import yanzhikai.simpleplayer.model.DaoMaster;
-import yanzhikai.simpleplayer.model.DaoSession;
+import yanzhikai.simpleplayer.model.PlayingAudioInfo;
 
 /**
  * author : yany
@@ -213,5 +215,42 @@ public class PlayListAudioDaoManager {
         }else {
             return false;
         }
+    }
+
+    public boolean setPlayingAudio(PlayingAudioInfo playingInfo){
+        deleteAllPlayingAudio();
+        boolean flag = false;
+        try {
+            flag = getDaoSession().getPlayingAudioInfoDao().insert(playingInfo) != -1;
+        }catch (SQLiteConstraintException e){
+            e.printStackTrace();
+            return false;
+        }
+        Log.i(TAG, "insert Audio :" + flag + "-->" + playingInfo.getSongName());
+        return flag;
+    }
+
+    /**
+     * 删除所有记录
+     * @return
+     */
+    public boolean deleteAllPlayingAudio(){
+        boolean flag = false;
+        try {
+            //按照id删除
+            getDaoSession().deleteAll(PlayingAudioInfo.class);
+            flag = true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
+    /**
+     * 查询所有记录
+     * @return
+     */
+    public List<PlayingAudioInfo> queryPlayingAudio(){
+        return getDaoSession().loadAll(PlayingAudioInfo.class);
     }
 }

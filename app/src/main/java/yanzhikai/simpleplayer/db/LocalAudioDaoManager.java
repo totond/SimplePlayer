@@ -4,14 +4,15 @@ import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 import android.util.Log;
 
+import com.jian.greendao.gen.AudioInfoDao;
+import com.jian.greendao.gen.DaoMaster;
+import com.jian.greendao.gen.DaoSession;
+
 import org.greenrobot.greendao.query.QueryBuilder;
 
 import java.util.List;
 
 import yanzhikai.simpleplayer.model.AudioInfo;
-import yanzhikai.simpleplayer.model.AudioInfoDao;
-import yanzhikai.simpleplayer.model.DaoMaster;
-import yanzhikai.simpleplayer.model.DaoSession;
 
 /**
  * author : yany

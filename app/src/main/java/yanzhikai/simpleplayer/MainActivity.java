@@ -20,6 +20,7 @@ import yanzhikai.simpleplayer.db.PlayListAudioDaoManager;
 import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.PlayList;
+import yanzhikai.simpleplayer.model.PlayingAudioInfo;
 import yanzhikai.simpleplayer.service.AudioPlayerService;
 import yanzhikai.simpleplayer.ui.ScanActivity;
 
@@ -79,11 +80,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 updateList();
                 break;
             case R.id.btn_pause:
-                mAudioPlayer.pause();
-                EventBus.getDefault().post(new AudioEvent());
+//                mAudioPlayer.pause();
+//                EventBus.getDefault().post(new AudioEvent());
+                PlayingAudioInfo playing = PlayListAudioDaoManager.getInstance().queryPlayingAudio().get(0);
+                Log.d(TAG, "getSongName: " + playing.getSongName());
+                Log.d(TAG, "getCurrentTimeText: " + playing.getCurrentTimeText());
+                Log.d(TAG, "size: " + PlayListAudioDaoManager.getInstance().queryPlayingAudio().size());
                 break;
             case R.id.btn_stop:
-                mAudioPlayer.stop();
+//                mAudioPlayer.stop();
+                PlayingAudioInfo playingAudioInfo = new PlayingAudioInfo(PlayListAudioDaoManager.getInstance().queryAllAudio().get(0));
+                playingAudioInfo.setCurrentTime(0);
+                playingAudioInfo.setCurrentTimeText("00:00");
+                PlayListAudioDaoManager.getInstance().setPlayingAudio(playingAudioInfo);
                 break;
             case R.id.btn_choose:
 //                mAudioPlayer.setPath("/storage/emulated/0/Music/陈奕迅 - 陀飞轮.mp3");
@@ -139,5 +148,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d(TAG, "onVideoSizeChanged: ");
 
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PlayListAudioDaoManager.getInstance().closeConnection();
+        LocalAudioDaoManager.getInstance().closeConnection();
     }
 }
