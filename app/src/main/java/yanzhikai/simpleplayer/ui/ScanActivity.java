@@ -25,6 +25,7 @@ public class ScanActivity extends Activity {
 
     private Handler mHandler;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +46,7 @@ public class ScanActivity extends Activity {
      * 扫描
      */
     private void doScaningHandler() {
+        mHandler.sendEmptyMessage(SCANING);
         new Thread() {
             @Override
             public void run() {
@@ -63,7 +65,6 @@ public class ScanActivity extends Activity {
                             LocalAudioDaoManager.getInstance().insertAudio(audioInfo);
                         }
 
-                        mHandler.sendEmptyMessage(SCANING);
                     }
 
                     @Override
@@ -74,7 +75,6 @@ public class ScanActivity extends Activity {
                 mHandler.sendEmptyMessage(FINISH);
             }
         }.start();
-
 
     }
 
@@ -103,5 +103,7 @@ public class ScanActivity extends Activity {
             }
         }
     }
+
+
 
 }

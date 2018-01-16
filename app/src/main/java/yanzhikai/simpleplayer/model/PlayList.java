@@ -26,7 +26,7 @@ public class PlayList {
 
     private ArrayList<AudioInfo> mAudioList;
 
-    private PlayList(){
+    private PlayList() {
         initData();
     }
 
@@ -40,7 +40,7 @@ public class PlayList {
         return instance;
     }
 
-    public void add(AudioInfo info){
+    public void add(AudioInfo info) {
         if (!isExist(info)) {
             mAudioList.add(info);
             PlayListAudioDaoManager.getInstance().insertAudio(info);
@@ -54,8 +54,8 @@ public class PlayList {
 //    }
 
     public void add(List<AudioInfo> infos) {
-        for (AudioInfo info : infos){
-            if (!isExist(info)){
+        for (AudioInfo info : infos) {
+            if (!isExist(info)) {
                 mAudioList.add(info);
                 PlayListAudioDaoManager.getInstance().insertAudio(info);
             }
@@ -63,7 +63,7 @@ public class PlayList {
 
     }
 
-    public boolean remove(AudioInfo info){
+    public boolean remove(AudioInfo info) {
         if (!isExist(info)) {
             PlayListAudioDaoManager.getInstance().deleteAudio(info);
             return mAudioList.remove(info);
@@ -71,7 +71,7 @@ public class PlayList {
         return false;
     }
 
-    public void remove(int index){
+    public void remove(int index) {
         AudioInfo audioInfo = mAudioList.get(index);
         if (!isExist(audioInfo)) {
             PlayListAudioDaoManager.getInstance().deleteAudio(audioInfo);
@@ -79,16 +79,16 @@ public class PlayList {
         }
     }
 
-    public void clear(){
+    public void clear() {
         mAudioList.clear();
         PlayListAudioDaoManager.getInstance().deleteAll();
     }
 
-    public Boolean isExist(AudioInfo info){
+    public Boolean isExist(AudioInfo info) {
         return PlayListAudioDaoManager.getInstance().isExist(info.getHash());
     }
 
-    private void setCurrentAudio(AudioInfo audioInfo){
+    private void setCurrentAudio(AudioInfo audioInfo) {
         PlayingAudioInfo playingAudioInfo = new PlayingAudioInfo(audioInfo);
         playingAudioInfo.setCurrentTime(0);
         playingAudioInfo.setCurrentTimeText("00:00");
@@ -97,25 +97,33 @@ public class PlayList {
 
     }
 
-    public AudioInfo getNextAudio(){
+    public AudioInfo getNextAudio(boolean isPre) {
+        if (mAudioList.size() == 0){
+            return null;
+        }
         int nextIndex = 0;
-        switch (mPlayModel){
+        switch (mPlayModel) {
             case PLAY_ORDER:
-                nextIndex = mCurrentIndex + 1;
-                if (nextIndex > mAudioList.size()){
-                    if (nextIndex == 1) {
-                        mCurrentAudio = null;
-                    }else {
-                        mCurrentAudio = mAudioList.get(0);
+                if (!isPre) {
+                    nextIndex = mCurrentIndex + 1;
+                    if (nextIndex > mAudioList.size()) {
+                        setCurrentAudio(mAudioList.get(0));
+                    } else {
+                        setCurrentAudio(mAudioList.get(nextIndex));
                     }
-                }else {
-                    setCurrentAudio(mAudioList.get(nextIndex));
+                } else {
+                    nextIndex = mCurrentIndex - 1;
+                    if (nextIndex >= 0) {
+                        setCurrentAudio(mAudioList.get(nextIndex));
+                    } else {
+                        setCurrentAudio(mAudioList.get(mAudioList.size() - 1));
+                    }
                 }
                 break;
             case PLAY_RANDOM:
                 Random random = new Random();
                 nextIndex = mCurrentIndex;
-                while (nextIndex == mCurrentIndex){
+                while (nextIndex == mCurrentIndex) {
                     nextIndex = random.nextInt(mAudioList.size());
                 }
                 setCurrentAudio(mAudioList.get(nextIndex));
@@ -147,5 +155,10 @@ public class PlayList {
         this.mCurrentIndex = currentIndex;
     }
 
-
+    public AudioInfo getCurrentAudio() {
+        if (mCurrentAudio == null && mAudioList.size() > 0){
+            setCurrentAudio(mAudioList.get(0));
+        }
+        return mCurrentAudio;
+    }
 }

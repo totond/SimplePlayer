@@ -226,7 +226,7 @@ public class PlayListAudioDaoManager {
             e.printStackTrace();
             return false;
         }
-        Log.i(TAG, "insert Audio :" + flag + "-->" + playingInfo.getSongName());
+        Log.i(TAG, "insert playing Audio :" + flag + "-->" + playingInfo.getSongName());
         return flag;
     }
 

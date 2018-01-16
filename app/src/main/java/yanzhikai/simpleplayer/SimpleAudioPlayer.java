@@ -133,6 +133,11 @@ public class SimpleAudioPlayer {
         }
     }
 
+
+    public boolean hasPath(){
+        return mPath == null;
+    }
+
     public void setPath(String path) {
         this.mPath = path;
     }

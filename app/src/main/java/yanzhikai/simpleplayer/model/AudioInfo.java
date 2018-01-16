@@ -264,7 +264,7 @@ public class AudioInfo implements Serializable {
                 ", downloadUrl='" + downloadUrl + '\'' +
                 ", createTime='" + createTime + '\'' +
                 ", status=" + status +
-                ", type=" + type +
+                ", mType=" + type +
                 ", category='" + category + '\'' +
                 ", childCategory='" + childCategory + '\'' +
                 '}';
