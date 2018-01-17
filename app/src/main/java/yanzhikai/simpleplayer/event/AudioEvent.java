@@ -20,9 +20,10 @@ public class AudioEvent {
     private int mType = AUDIO_NULL;
 
     private AudioInfo mInfo;
+    private int mAudioIndex = -1;
 
-    public AudioEvent(AudioInfo info, int type){
-        mInfo = info;
+    public AudioEvent(int index, int type){
+        mAudioIndex = index;
         mType = type;
     }
 
@@ -30,9 +31,10 @@ public class AudioEvent {
         this.mInfo = info;
     }
 
-    public AudioInfo getInfo() {
-        return mInfo;
+    public int getAudioIndex() {
+        return mAudioIndex;
     }
+
 
     public int getType() {
         return mType;

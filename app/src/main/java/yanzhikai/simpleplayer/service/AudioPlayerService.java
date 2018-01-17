@@ -16,6 +16,7 @@ import yanzhikai.simpleplayer.AudioPlayerListener;
 import yanzhikai.simpleplayer.MainActivity;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.SimpleAudioPlayer;
+import yanzhikai.simpleplayer.event.AudioChangedEvent;
 import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
@@ -87,13 +88,19 @@ public class AudioPlayerService extends Service {
     }
 
     private void playNext(){
-        mAudioPlayer.setPath(PlayList.getInstance().getNextAudio(false).getFilePath());
+        AudioInfo audioInfo = PlayList.getInstance().getNextAudio(false);
+        mAudioPlayer.setPath(audioInfo.getFilePath());
         mAudioPlayer.prepareAsync();
+//        PlayList.getInstance().setCurrentAudio(audioInfo);
+        startPlayingThread();
     }
 
     private void playPre(){
-        mAudioPlayer.setPath(PlayList.getInstance().getNextAudio(true).getFilePath());
+        AudioInfo audioInfo = PlayList.getInstance().getNextAudio(true);
+        mAudioPlayer.setPath(audioInfo.getFilePath());
         mAudioPlayer.prepareAsync();
+//        PlayList.getInstance().setCurrentAudio(audioInfo);
+        startPlayingThread();
     }
 
     @Subscribe
@@ -114,27 +121,37 @@ public class AudioPlayerService extends Service {
                 break;
             case AudioEvent.AUDIO_PRE:
                 playPre();
+                notifyAudioChanged();
                 break;
             case AudioEvent.AUDIO_NEXT:
                 playNext();
+                notifyAudioChanged();
                 break;
             case AudioEvent.AUDIO_PLAY_CHOSEN:
-                Log.d(TAG, "handleEvent: AUDIO_PLAY_CHOSEN:" + event.getInfo().getFilePath());
-                mAudioPlayer.setPath(event.getInfo().getFilePath());
+                AudioInfo info = PlayList.getInstance().getAudioList().get(event.getAudioIndex());
+                Log.d(TAG, "handleEvent: AUDIO_PLAY_CHOSEN:" + info.getFilePath());
+                mAudioPlayer.setPath(info.getFilePath());
                 mAudioPlayer.prepareAsync();
+                PlayList.getInstance().setCurrentAudio(info,event.getAudioIndex());
                 startPlayingThread();
+                notifyAudioChanged();
                 break;
         }
     }
 
+    private void notifyAudioChanged(){
+        EventBus.getDefault().post(new AudioChangedEvent());
+    }
+
     private void handlePlayingDetail(){
-        Log.d(TAG, "handlePlayingDetail: ");
         CurrentAudioDetailEvent detailEvent = new CurrentAudioDetailEvent();
         AudioInfo currentInfo = PlayList.getInstance().getCurrentAudio();
-        detailEvent.durationText = currentInfo.getDurationText();
-        detailEvent.progress = (float) mAudioPlayer.getCurrentPosition() / currentInfo.getDuration();
-        detailEvent.currentTimeText = MediaUtil.parseTimeToString((int) (currentInfo.getDuration() * detailEvent.progress));
-        EventBus.getDefault().post(currentInfo);
+        if (currentInfo != null) {
+            detailEvent.durationText = currentInfo.getDurationText();
+            detailEvent.progress = (float) mAudioPlayer.getCurrentPosition() / currentInfo.getDuration();
+            detailEvent.currentTimeText = MediaUtil.parseTimeToString((int) (currentInfo.getDuration() * detailEvent.progress));
+            EventBus.getDefault().post(detailEvent);
+        }
     }
 
     private void startPlayingThread(){
@@ -161,7 +178,8 @@ public class AudioPlayerService extends Service {
 
         @Override
         public void run() {
-            if (isPlaying){
+            while (isPlaying){
+//                Log.d(TAG, "run: ");
                 handlePlayingDetail();
                 try {
                     Thread.sleep(300);

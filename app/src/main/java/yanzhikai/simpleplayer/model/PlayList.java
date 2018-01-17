@@ -20,7 +20,7 @@ public class PlayList {
     public static final int PLAY_SINGLE = 2;
 
     private int mPlayModel = PLAY_ORDER;
-    private int mCurrentIndex = 0;
+    private int mCurrentIndex = -1;
     private AudioInfo mCurrentAudio;
 
 
@@ -88,11 +88,12 @@ public class PlayList {
         return PlayListAudioDaoManager.getInstance().isExist(info.getHash());
     }
 
-    private void setCurrentAudio(AudioInfo audioInfo) {
+    public void setCurrentAudio(AudioInfo audioInfo,int index) {
         PlayingAudioInfo playingAudioInfo = new PlayingAudioInfo(audioInfo);
         playingAudioInfo.setCurrentTime(0);
         playingAudioInfo.setCurrentTimeText("00:00");
         PlayListAudioDaoManager.getInstance().setPlayingAudio(playingAudioInfo);
+        mCurrentIndex = index;
         mCurrentAudio = audioInfo;
 
     }
@@ -107,16 +108,16 @@ public class PlayList {
                 if (!isPre) {
                     nextIndex = mCurrentIndex + 1;
                     if (nextIndex > mAudioList.size()) {
-                        setCurrentAudio(mAudioList.get(0));
+                        setCurrentAudio(mAudioList.get(0),0);
                     } else {
-                        setCurrentAudio(mAudioList.get(nextIndex));
+                        setCurrentAudio(mAudioList.get(nextIndex),nextIndex);
                     }
                 } else {
                     nextIndex = mCurrentIndex - 1;
                     if (nextIndex >= 0) {
-                        setCurrentAudio(mAudioList.get(nextIndex));
+                        setCurrentAudio(mAudioList.get(nextIndex),nextIndex);
                     } else {
-                        setCurrentAudio(mAudioList.get(mAudioList.size() - 1));
+                        setCurrentAudio(mAudioList.get(mAudioList.size() - 1),mAudioList.size() - 1);
                     }
                 }
                 break;
@@ -126,7 +127,7 @@ public class PlayList {
                 while (nextIndex == mCurrentIndex) {
                     nextIndex = random.nextInt(mAudioList.size());
                 }
-                setCurrentAudio(mAudioList.get(nextIndex));
+                setCurrentAudio(mAudioList.get(nextIndex),nextIndex);
                 break;
             case PLAY_SINGLE:
                 mCurrentAudio = mAudioList.get(mCurrentIndex);
@@ -157,7 +158,7 @@ public class PlayList {
 
     public AudioInfo getCurrentAudio() {
         if (mCurrentAudio == null && mAudioList.size() > 0){
-            setCurrentAudio(mAudioList.get(0));
+            setCurrentAudio(mAudioList.get(0),0);
         }
         return mCurrentAudio;
     }

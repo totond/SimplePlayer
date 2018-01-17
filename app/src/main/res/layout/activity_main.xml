@@ -18,8 +18,8 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_play"
-            android:text="PLAY"
+            android:id="@+id/btn_pre"
+            android:text="PRE"
             android:layout_weight="1"
             />
 
@@ -27,15 +27,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btn_pause"
-            android:text="pause"
+            android:text="PAUSE"
             android:layout_weight="1"
             />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_stop"
-            android:text="stop"
+            android:id="@+id/btn_next"
+            android:text="NEXT"
             android:layout_weight="1"
             />
 
