@@ -1,9 +1,7 @@
 package yanzhikai.simpleplayer;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -32,18 +31,17 @@ import static yanzhikai.simpleplayer.event.AudioEvent.AUDIO_PLAY_CHOSEN;
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener{
     public static final String TAG = "yjkMainActivity";
-    private Button btn_play,btn_pause,btn_stop,btn_choose;
-    private SimpleAudioPlayer mAudioPlayer;
+    private Button btn_pre, btn_play_pause, btn_next,btn_choose;
     private SeekBar sb_progress;
     private RecyclerView rv_play_list;
     private PlayListAdapter mPlayListAdapter;
+    private boolean canUpdate = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAudioPlayer = new SimpleAudioPlayer(this);
         startService(new Intent(this,AudioPlayerService.class));
         EventBus.getDefault().register(this);
         initView();
@@ -56,14 +54,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     }
 
     private void initView() {
-        btn_play = findViewById(R.id.btn_pre);
-        btn_pause = findViewById(R.id.btn_pause);
-        btn_stop = findViewById(R.id.btn_next);
+        btn_pre = findViewById(R.id.btn_pre);
+        btn_play_pause = findViewById(R.id.btn_pause);
+        btn_next = findViewById(R.id.btn_next);
         btn_choose = findViewById(R.id.btn_choose);
         sb_progress = findViewById(R.id.sb_progress);
-        btn_play.setOnClickListener(this);
-        btn_pause.setOnClickListener(this);
-        btn_stop.setOnClickListener(this);
+        btn_pre.setOnClickListener(this);
+        btn_play_pause.setOnClickListener(this);
+        btn_next.setOnClickListener(this);
         btn_choose.setOnClickListener(this);
         sb_progress.setMax(1000);
         sb_progress.setOnSeekBarChangeListener(new MyProgressListener());
@@ -89,8 +87,27 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     }
 
     private void updateProgress(float progress){
-        sb_progress.setProgress((int) (progress * 1000));
+        if (canUpdate) {
+            sb_progress.setProgress((int) (progress * 1000));
+        }
     }
+
+    private void updateStartAndPause(){
+        if (AudioPlayerService.isPlaying){
+            btn_play_pause.setText("PAUSE");
+        }else {
+            btn_play_pause.setText("START");
+        }
+    }
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void handleUIControl(UIControlEvent uiControlEvent){
+//        switch (uiControlEvent.getType()){
+//            case UIControlEvent.AUDIO_SEEK_COMPLETED:
+//                canUpdate = true;
+//                makeToast("canUpdate");
+//                break;
+//        }
+//    }
 
     private void updateList(){
         Log.d(TAG, "updateList: ");
@@ -108,15 +125,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //                Log.d(TAG, "PlayList.getInstance().getAudioList(): " + PlayList.getInstance().getAudioList().size());
 //                updateList();
                 EventBus.getDefault().post(new AudioEvent(-1,AudioEvent.AUDIO_PRE));
-                mPlayListAdapter.notifyItemChanged(1);
                 break;
             case R.id.btn_pause:
-//                mAudioPlayer.pause();
-                EventBus.getDefault().post(new AudioEvent(-1,AudioEvent.AUDIO_PAUSE));
-//                PlayingAudioInfo playing = PlayListAudioDaoManager.getInstance().queryPlayingAudio().get(0);
-//                Log.d(TAG, "getSongName: " + playing.getSongName());
-//                Log.d(TAG, "getCurrentTimeText: " + playing.getCurrentTimeText());
-//                Log.d(TAG, "size: " + PlayListAudioDaoManager.getInstance().queryPlayingAudio().size());
+                if (AudioPlayerService.isPlaying) {
+                    EventBus.getDefault().post(new AudioEvent(-1, AudioEvent.AUDIO_PAUSE));
+                }else {
+                    EventBus.getDefault().post(new AudioEvent(-1, AudioEvent.AUDIO_PLAY));
+                }
+                updateStartAndPause();
                 break;
             case R.id.btn_next:
 //                mAudioPlayer.stop();
@@ -151,15 +167,23 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
-
+//            canUpdate = false;
+            AudioEvent audioEvent = new AudioEvent(-1,AudioEvent.AUDIO_SEEK_START);
+            EventBus.getDefault().post(audioEvent);
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-
+            AudioEvent audioEvent = new AudioEvent(-1,AudioEvent.AUDIO_SEEK_TO);
+            audioEvent.setProgress(sb_progress.getProgress() / 1000f);
+            EventBus.getDefault().post(audioEvent);
+//            canUpdate = true;
         }
     }
 
+    private void makeToast(String str){
+        Toast.makeText(this,str,Toast.LENGTH_LONG).show();
+    }
 
     @Override
     protected void onDestroy() {

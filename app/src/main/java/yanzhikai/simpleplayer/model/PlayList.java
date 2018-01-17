@@ -19,9 +19,10 @@ public class PlayList {
     public static final int PLAY_RANDOM = 1;
     public static final int PLAY_SINGLE = 2;
 
-    private int mPlayModel = PLAY_ORDER;
+    private int mPlayModel = PLAY_RANDOM;
     private int mCurrentIndex = -1;
     private AudioInfo mCurrentAudio;
+
 
 
     private ArrayList<AudioInfo> mAudioList;
@@ -107,7 +108,7 @@ public class PlayList {
             case PLAY_ORDER:
                 if (!isPre) {
                     nextIndex = mCurrentIndex + 1;
-                    if (nextIndex > mAudioList.size()) {
+                    if (nextIndex >= mAudioList.size()) {
                         setCurrentAudio(mAudioList.get(0),0);
                     } else {
                         setCurrentAudio(mAudioList.get(nextIndex),nextIndex);

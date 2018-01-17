@@ -60,6 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/sb_progress"
+        android:layout_marginBottom="30dp"
         android:id="@+id/rv_play_list">
 
     </android.support.v7.widget.RecyclerView>

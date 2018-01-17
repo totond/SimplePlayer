@@ -16,11 +16,15 @@ public class AudioEvent {
     public static final int AUDIO_PRE = 3;
     public static final int AUDIO_NEXT = 4;
     public static final int AUDIO_PLAY_CHOSEN = 5;
+    public static final int AUDIO_SEEK_START = 6;
+    public static final int AUDIO_SEEK_TO = 7;
 
     private int mType = AUDIO_NULL;
 
     private AudioInfo mInfo;
     private int mAudioIndex = -1;
+
+    private float mProgress;
 
     public AudioEvent(int index, int type){
         mAudioIndex = index;
@@ -42,5 +46,13 @@ public class AudioEvent {
 
     public void setType(int type) {
         this.mType = type;
+    }
+
+    public void setProgress(float progress) {
+        this.mProgress = progress;
+    }
+
+    public float getProgress() {
+        return mProgress;
     }
 }

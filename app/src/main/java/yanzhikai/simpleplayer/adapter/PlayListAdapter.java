@@ -87,13 +87,15 @@ public class PlayListAdapter extends RecyclerView.Adapter {
     }
 
     public void refreshItem(){
-        Log.d(TAG, "refreshItem: " + mCurrentIndex);
+        Log.e(TAG, "refreshItem: " + mCurrentIndex);
         if (mCurrentIndex != -1){
             notifyItemChanged(mCurrentIndex);
         }
         mCurrentIndex = PlayList.getInstance().getCurrentIndex();
-        Log.d(TAG, "refreshItem a: " + mCurrentIndex);
-        notifyItemChanged(mCurrentIndex);
+        Log.e(TAG, "refreshItem a: " + mCurrentIndex);
+        if (mCurrentIndex != -1) {
+            notifyItemChanged(mCurrentIndex);
+        }
     }
 
     public void setListener(PlayListItemOnClickListener listener) {

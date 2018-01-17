@@ -49,11 +49,8 @@ public class SimpleAudioPlayer {
      * 创建一个新的player
      */
     private void createPlayer() {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
-            mMediaPlayer.setDisplay(null);
-            mMediaPlayer.release();
-        }
+        release();
+
         IjkMediaPlayer ijkMediaPlayer = new IjkMediaPlayer();
         ijkMediaPlayer.native_setLogLevel(IjkMediaPlayer.IJK_LOG_DEBUG);
 
@@ -69,6 +66,8 @@ public class SimpleAudioPlayer {
             mMediaPlayer.setOnSeekCompleteListener(mListener);
             mMediaPlayer.setOnBufferingUpdateListener(mListener);
             mMediaPlayer.setOnErrorListener(mListener);
+            mMediaPlayer.setOnCompletionListener(mListener);
+            mMediaPlayer.setOnTimedTextListener(mListener);
             mListener.onNewPlayer();
         }
     }
@@ -82,7 +81,10 @@ public class SimpleAudioPlayer {
 
     public void release() {
         if (mMediaPlayer != null) {
-            mMediaPlayer.reset();
+            if (mMediaPlayer.isPlaying()) {
+                mMediaPlayer.stop();
+            }
+            //mMediaPlayer.reset();
             mMediaPlayer.release();
             mMediaPlayer = null;
         }
@@ -101,6 +103,10 @@ public class SimpleAudioPlayer {
         }
     }
 
+
+    public boolean isPlaying(){
+        return mMediaPlayer.isPlaying();
+    }
 
     public void reset() {
         if (mMediaPlayer != null) {
