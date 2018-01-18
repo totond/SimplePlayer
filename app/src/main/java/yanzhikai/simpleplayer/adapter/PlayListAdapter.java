@@ -91,6 +91,7 @@ public class PlayListAdapter extends RecyclerView.Adapter {
         if (mCurrentIndex != -1){
             notifyItemChanged(mCurrentIndex);
         }
+
         mCurrentIndex = PlayList.getInstance().getCurrentIndex();
         Log.e(TAG, "refreshItem a: " + mCurrentIndex);
         if (mCurrentIndex != -1) {

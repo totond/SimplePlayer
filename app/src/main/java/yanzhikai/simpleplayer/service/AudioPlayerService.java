@@ -3,10 +3,14 @@ package yanzhikai.simpleplayer.service;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
@@ -22,7 +26,6 @@ import yanzhikai.simpleplayer.event.AudioChangedEvent;
 import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.event.AudioStartPauseEvent;
 import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
-import yanzhikai.simpleplayer.event.UIControlEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.utils.MediaUtil;
@@ -43,20 +46,34 @@ public class AudioPlayerService extends Service {
 
     public static boolean isPlaying = false;
 
+    private static final int NOTIFICATION_ID = 110;
+
+    private static final int REQUEST_CODE = 0;
+    private static final String ACTION_PLAY_PAUSE = "PLAY_PAUSE";
+    private static final String ACTION_PRE = "PRE";
+    private static final String ACTION_NEXT = "NEXT";
+
+    /**
+     * 状态栏播放器视图
+     */
+    private RemoteViews mNotificationRemoteViews;
+
+    private PlayerReceiver mPlayerReceiver;
+
     public AudioPlayerService() {
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        buildNotification();
         init();
+        buildNotification();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        startForeground(110, mNotification);
+        startForeground(NOTIFICATION_ID, mNotification);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -66,20 +83,37 @@ public class AudioPlayerService extends Service {
     }
 
     private void buildNotification() {
+        mNotificationRemoteViews = new RemoteViews(getPackageName(), R.layout.layout_player_notification);
+        Intent intentPlay = new Intent(ACTION_PLAY_PAUSE);// 指定操作意图--设置对应的行为ACTION
+        PendingIntent pIntentPlay = PendingIntent.getBroadcast(this.getApplicationContext(),
+                REQUEST_CODE, intentPlay, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent intentPre = new Intent(ACTION_PRE);
+        PendingIntent pIntentPre = PendingIntent.getBroadcast(this.getApplicationContext(),
+                REQUEST_CODE, intentPre, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent intentNext = new Intent(ACTION_NEXT);
+        PendingIntent pIntentNext = PendingIntent.getBroadcast(this.getApplicationContext(),
+                REQUEST_CODE, intentNext, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
         Notification.Builder builder = new Notification.Builder
                 (this.getApplicationContext()); //获取一个Notification构造器
         Intent nfIntent = new Intent(this, MainActivity.class);
 
         builder.setContentIntent(PendingIntent.
                 getActivity(this, 0, nfIntent, 0)) // 设置PendingIntent
+                .setContent(mNotificationRemoteViews)
+                .setWhen(System.currentTimeMillis())
+                .setSmallIcon(R.mipmap.ic_launcher);
 
-                .setContentTitle("下拉列表中的Title") // 设置下拉列表里的标题
-                .setSmallIcon(R.mipmap.ic_launcher) // 设置状态栏内的小图标
-                .setContentText("要显示的内容") // 设置上下文内容
-                .setWhen(System.currentTimeMillis()); // 设置该通知发生的时间
+        mNotificationRemoteViews.setOnClickPendingIntent(R.id.iv_play_pause,pIntentPlay);
+        mNotificationRemoteViews.setOnClickPendingIntent(R.id.iv_pre,pIntentPre);
+        mNotificationRemoteViews.setOnClickPendingIntent(R.id.iv_next,pIntentNext);
+
 
         mNotification = builder.build(); // 获取构建好的Notification
-        mNotification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
+//        mNotification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
 
     }
 
@@ -87,6 +121,13 @@ public class AudioPlayerService extends Service {
         mAudioPlayer = new SimpleAudioPlayer(getApplicationContext());
         mAudioPlayer.setAudioListener(new MyAudioPlayerListener());
         EventBus.getDefault().register(this);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_PLAY_PAUSE);
+        filter.addAction(ACTION_NEXT);
+        filter.addAction(ACTION_PRE);
+
+        mPlayerReceiver = new PlayerReceiver();
+        registerReceiver(mPlayerReceiver,filter);
     }
 
     @Override
@@ -95,6 +136,26 @@ public class AudioPlayerService extends Service {
         stopPlayingThread();
         EventBus.getDefault().unregister(this);
         mAudioPlayer.release();
+        unregisterReceiver(mPlayerReceiver);
+    }
+
+    private void playStart(){
+        if (isPrepared) {
+            mAudioPlayer.start();
+        }
+        startPlayingThread();
+        isPlaying = true;
+        EventBus.getDefault().post(new AudioStartPauseEvent(true));
+        updateNotification();
+    }
+
+    private void playPause(){
+        mAudioPlayer.pause();
+        stopPlayingThread();
+        isPlaying = false;
+        EventBus.getDefault().post(new AudioStartPauseEvent(false));
+
+        updateNotification();
     }
 
     private void playNext() {
@@ -104,6 +165,9 @@ public class AudioPlayerService extends Service {
 //        PlayList.getInstance().setCurrentAudio(audioInfo);
         startPlayingThread();
         notifyAudioChanged();
+        isPlaying = true;
+        EventBus.getDefault().post(new AudioStartPauseEvent(true));
+        updateNotification();
     }
 
     private void playPre() {
@@ -113,6 +177,19 @@ public class AudioPlayerService extends Service {
 //        PlayList.getInstance().setCurrentAudio(audioInfo);
         startPlayingThread();
         notifyAudioChanged();
+        isPlaying = true;
+        EventBus.getDefault().post(new AudioStartPauseEvent(true));
+        updateNotification();
+    }
+
+    private void updateNotification(){
+        if (isPlaying){
+            mNotificationRemoteViews.setImageViewResource(R.id.iv_play_pause,R.mipmap.pause);
+        }else {
+            mNotificationRemoteViews.setImageViewResource(R.id.iv_play_pause,R.mipmap.play);
+        }
+
+        startForeground(NOTIFICATION_ID, mNotification);
     }
 
     @Subscribe
@@ -123,28 +200,17 @@ public class AudioPlayerService extends Service {
 
                 break;
             case AudioEvent.AUDIO_PLAY:
-                if (isPrepared) {
-                    mAudioPlayer.start();
-                }
-                startPlayingThread();
-                isPlaying = true;
-                EventBus.getDefault().post(new AudioStartPauseEvent(true));
+                playStart();
                 break;
             case AudioEvent.AUDIO_PAUSE:
-                mAudioPlayer.pause();
-                stopPlayingThread();
-                isPlaying = false;
-                EventBus.getDefault().post(new AudioStartPauseEvent(false));
+                playPause();
                 break;
             case AudioEvent.AUDIO_PRE:
                 playPre();
-                isPlaying = true;
-                EventBus.getDefault().post(new AudioStartPauseEvent(true));
                 break;
             case AudioEvent.AUDIO_NEXT:
                 playNext();
-                isPlaying = true;
-                EventBus.getDefault().post(new AudioStartPauseEvent(true));
+
                 break;
             case AudioEvent.AUDIO_PLAY_CHOSEN:
                 AudioInfo info = PlayList.getInstance().getAudioList().get(event.getAudioIndex());
@@ -158,22 +224,17 @@ public class AudioPlayerService extends Service {
                 EventBus.getDefault().post(new AudioStartPauseEvent(true));
                 break;
             case AudioEvent.AUDIO_SEEK_START:
-                if (mAudioPlayer.isPlaying()){
-                    makeToast("isSeeking ");
+                if (mAudioPlayer.isPlaying()) {
                     isSeeking = true;
                 }
                 break;
             case AudioEvent.AUDIO_SEEK_TO:
 //                if (mAudioPlayer.isPlaying()) {
-                    Log.i(TAG, "seek to: " + (long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
-                    mAudioPlayer.seekTo((long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
+                Log.i(TAG, "seek to: " + (long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
+                mAudioPlayer.seekTo((long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
 //                }
                 break;
         }
-    }
-
-    private void makeToast(String str) {
-        Toast.makeText(this, str, Toast.LENGTH_LONG).show();
     }
 
 
@@ -256,27 +317,27 @@ public class AudioPlayerService extends Service {
         @Override
         public boolean onError(IMediaPlayer iMediaPlayer, int i, int i1) {
             Log.i(TAG, "onError: ");
-            switch (i){
+            switch (i) {
                 case IMediaPlayer.MEDIA_ERROR_UNKNOWN:
-                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_UNKNOWN");
+                    ToastUtil.makeShortToast(AudioPlayerService.this, "MEDIA_ERROR_UNKNOWN");
                     break;
                 case IMediaPlayer.MEDIA_ERROR_SERVER_DIED:
-                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_SERVER_DIED");
+                    ToastUtil.makeShortToast(AudioPlayerService.this, "MEDIA_ERROR_SERVER_DIED");
                     break;
                 case IMediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK:
-                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK");
+                    ToastUtil.makeShortToast(AudioPlayerService.this, "MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK");
                     break;
                 case IMediaPlayer.MEDIA_ERROR_IO:
-                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_IO");
+                    ToastUtil.makeShortToast(AudioPlayerService.this, "MEDIA_ERROR_IO");
                     break;
                 case IMediaPlayer.MEDIA_ERROR_MALFORMED:
-                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_MALFORMED");
+                    ToastUtil.makeShortToast(AudioPlayerService.this, "MEDIA_ERROR_MALFORMED");
                     break;
                 case IMediaPlayer.MEDIA_ERROR_UNSUPPORTED:
-                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_UNSUPPORTED");
+                    ToastUtil.makeShortToast(AudioPlayerService.this, "MEDIA_ERROR_UNSUPPORTED");
                     break;
                 case IMediaPlayer.MEDIA_ERROR_TIMED_OUT:
-                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_TIMED_OUT");
+                    ToastUtil.makeShortToast(AudioPlayerService.this, "MEDIA_ERROR_TIMED_OUT");
                     break;
             }
             return false;
@@ -284,14 +345,14 @@ public class AudioPlayerService extends Service {
 
         @Override
         public boolean onInfo(IMediaPlayer iMediaPlayer, int i, int i1) {
-            ToastUtil.makeShortToast(AudioPlayerService.this,"onInfo" + i);
+//            ToastUtil.makeShortToast(AudioPlayerService.this, "onInfo" + i);
             Log.i(TAG, "onInfo: ");
             if (i == IMediaPlayer.MEDIA_INFO_BUFFERING_START) {
                 Log.d(TAG, "MEDIA_INFO_BUFFERING_START: ");
             } else if (i == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
 
                 Log.d(TAG, "MEDIA_INFO_BUFFERING_END: ");
-            }else if (i == IMediaPlayer.MEDIA_INFO_NOT_SEEKABLE){
+            } else if (i == IMediaPlayer.MEDIA_INFO_NOT_SEEKABLE) {
                 Log.d(TAG, "MEDIA_INFO_NOT_SEEKABLE: ");
             }
             return false;
@@ -321,6 +382,33 @@ public class AudioPlayerService extends Service {
         @Override
         public void onTimedText(IMediaPlayer iMediaPlayer, IjkTimedText ijkTimedText) {
             Log.i(TAG, "onTimedText: " + ijkTimedText);
+        }
+    }
+
+
+    public class PlayerReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() != null) {
+                switch (intent.getAction()) {
+                    case ACTION_PLAY_PAUSE:
+                        if (mAudioPlayer.isPlaying()){
+                            playPause();
+                            ToastUtil.makeShortToast(AudioPlayerService.this,"playPause");
+                        }else {
+                            ToastUtil.makeShortToast(AudioPlayerService.this,"playStart");
+                            playStart();
+                        }
+                        break;
+                    case ACTION_NEXT:
+                        playNext();
+                        break;
+                    case ACTION_PRE:
+                        playPre();
+                        break;
+                }
+            }
         }
     }
 }

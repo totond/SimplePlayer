@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Welcome to Simple Player！"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="16dp" />
+
+    <ImageView
+        android:id="@+id/iv_play_pause"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/tv_title"
+        android:layout_marginTop="2dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/background_btn"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@mipmap/play"
+        android:scaleType="fitXY"
+        />
+
+    <ImageView
+        android:id="@+id/iv_next"
+        android:layout_width="65dp"
+        android:layout_height="50dp"
+        android:layout_alignTop="@+id/iv_play_pause"
+        android:layout_toRightOf="@+id/iv_play_pause"
+        android:layout_marginLeft="40dp"
+        android:focusable="true"
+        android:background="@drawable/background_btn"
+        android:clickable="true"
+        android:src="@mipmap/next"
+        android:scaleType="fitXY"
+        />
+
+    <ImageView
+        android:id="@+id/iv_pre"
+        android:layout_width="65dp"
+        android:layout_height="50dp"
+        android:layout_alignTop="@+id/iv_play_pause"
+        android:layout_toLeftOf="@+id/iv_play_pause"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/background_btn"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@mipmap/previous"
+        android:scaleType="fitXY"
+        />
+</RelativeLayout>

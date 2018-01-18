@@ -46,6 +46,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         EventBus.getDefault().register(this);
         initView();
+
     }
 
     @Override
@@ -85,6 +86,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleAudioChanged(AudioChangedEvent changedEvent){
         mPlayListAdapter.refreshItem();
+        rv_play_list.smoothScrollToPosition(PlayList.getInstance().getCurrentIndex());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
