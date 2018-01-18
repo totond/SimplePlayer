@@ -20,11 +20,13 @@ import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.SimpleAudioPlayer;
 import yanzhikai.simpleplayer.event.AudioChangedEvent;
 import yanzhikai.simpleplayer.event.AudioEvent;
+import yanzhikai.simpleplayer.event.AudioStartPauseEvent;
 import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
 import yanzhikai.simpleplayer.event.UIControlEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.utils.MediaUtil;
+import yanzhikai.simpleplayer.utils.ToastUtil;
 
 public class AudioPlayerService extends Service {
     public static final String TAG = "yjkAudioPlayerService";
@@ -124,21 +126,25 @@ public class AudioPlayerService extends Service {
                 if (isPrepared) {
                     mAudioPlayer.start();
                 }
-                isPlaying = true;
                 startPlayingThread();
+                isPlaying = true;
+                EventBus.getDefault().post(new AudioStartPauseEvent(true));
                 break;
             case AudioEvent.AUDIO_PAUSE:
                 mAudioPlayer.pause();
                 stopPlayingThread();
                 isPlaying = false;
+                EventBus.getDefault().post(new AudioStartPauseEvent(false));
                 break;
             case AudioEvent.AUDIO_PRE:
                 playPre();
-
+                isPlaying = true;
+                EventBus.getDefault().post(new AudioStartPauseEvent(true));
                 break;
             case AudioEvent.AUDIO_NEXT:
                 playNext();
-
+                isPlaying = true;
+                EventBus.getDefault().post(new AudioStartPauseEvent(true));
                 break;
             case AudioEvent.AUDIO_PLAY_CHOSEN:
                 AudioInfo info = PlayList.getInstance().getAudioList().get(event.getAudioIndex());
@@ -148,6 +154,8 @@ public class AudioPlayerService extends Service {
                 PlayList.getInstance().setCurrentAudio(info, event.getAudioIndex());
                 startPlayingThread();
                 notifyAudioChanged();
+                isPlaying = true;
+                EventBus.getDefault().post(new AudioStartPauseEvent(true));
                 break;
             case AudioEvent.AUDIO_SEEK_START:
                 if (mAudioPlayer.isPlaying()){
@@ -156,10 +164,10 @@ public class AudioPlayerService extends Service {
                 }
                 break;
             case AudioEvent.AUDIO_SEEK_TO:
-                if (mAudioPlayer.isPlaying()) {
+//                if (mAudioPlayer.isPlaying()) {
                     Log.i(TAG, "seek to: " + (long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
                     mAudioPlayer.seekTo((long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
-                }
+//                }
                 break;
         }
     }
@@ -248,18 +256,40 @@ public class AudioPlayerService extends Service {
         @Override
         public boolean onError(IMediaPlayer iMediaPlayer, int i, int i1) {
             Log.i(TAG, "onError: ");
-            if (i == IMediaPlayer.MEDIA_ERROR_UNKNOWN){
-                Log.d(TAG, "MEDIA_ERROR_UNKNOWN: ");
+            switch (i){
+                case IMediaPlayer.MEDIA_ERROR_UNKNOWN:
+                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_UNKNOWN");
+                    break;
+                case IMediaPlayer.MEDIA_ERROR_SERVER_DIED:
+                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_SERVER_DIED");
+                    break;
+                case IMediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK:
+                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK");
+                    break;
+                case IMediaPlayer.MEDIA_ERROR_IO:
+                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_IO");
+                    break;
+                case IMediaPlayer.MEDIA_ERROR_MALFORMED:
+                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_MALFORMED");
+                    break;
+                case IMediaPlayer.MEDIA_ERROR_UNSUPPORTED:
+                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_UNSUPPORTED");
+                    break;
+                case IMediaPlayer.MEDIA_ERROR_TIMED_OUT:
+                    ToastUtil.makeShortToast(AudioPlayerService.this,"MEDIA_ERROR_TIMED_OUT");
+                    break;
             }
             return false;
         }
 
         @Override
         public boolean onInfo(IMediaPlayer iMediaPlayer, int i, int i1) {
+            ToastUtil.makeShortToast(AudioPlayerService.this,"onInfo" + i);
             Log.i(TAG, "onInfo: ");
             if (i == IMediaPlayer.MEDIA_INFO_BUFFERING_START) {
                 Log.d(TAG, "MEDIA_INFO_BUFFERING_START: ");
             } else if (i == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
+
                 Log.d(TAG, "MEDIA_INFO_BUFFERING_END: ");
             }else if (i == IMediaPlayer.MEDIA_INFO_NOT_SEEKABLE){
                 Log.d(TAG, "MEDIA_INFO_NOT_SEEKABLE: ");
@@ -272,6 +302,7 @@ public class AudioPlayerService extends Service {
             Log.i(TAG, "onPrepared: ");
             isPrepared = true;
             isPlaying = true;
+            EventBus.getDefault().post(new AudioStartPauseEvent(true));
             Toast.makeText(AudioPlayerService.this, "onPrepared", Toast.LENGTH_SHORT).show();
         }
 

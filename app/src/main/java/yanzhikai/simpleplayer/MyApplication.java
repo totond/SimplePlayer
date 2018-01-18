@@ -1,9 +1,13 @@
 package yanzhikai.simpleplayer;
 
 import android.app.Application;
+import android.content.Intent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import yanzhikai.simpleplayer.db.LocalAudioDaoManager;
 import yanzhikai.simpleplayer.db.PlayListAudioDaoManager;
+import yanzhikai.simpleplayer.service.AudioPlayerService;
 
 /**
  * author : yany
@@ -24,6 +28,7 @@ public class MyApplication extends Application {
     private void init(){
         LocalAudioDaoManager.getInstance().init(getApplicationContext());
         PlayListAudioDaoManager.getInstance().init(getApplicationContext());
+        startService(new Intent(this,AudioPlayerService.class));
     }
 
     public static void closeDB(){

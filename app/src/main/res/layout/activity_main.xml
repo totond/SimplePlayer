@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/btn_pause"
-            android:text="PAUSE"
+            android:text="START"
             android:layout_weight="1"
             />
 

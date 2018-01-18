@@ -21,6 +21,7 @@ import yanzhikai.simpleplayer.db.LocalAudioDaoManager;
 import yanzhikai.simpleplayer.db.PlayListAudioDaoManager;
 import yanzhikai.simpleplayer.event.AudioChangedEvent;
 import yanzhikai.simpleplayer.event.AudioEvent;
+import yanzhikai.simpleplayer.event.AudioStartPauseEvent;
 import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.PlayList;
@@ -42,7 +43,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        startService(new Intent(this,AudioPlayerService.class));
+
         EventBus.getDefault().register(this);
         initView();
     }
@@ -86,16 +87,24 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         mPlayListAdapter.refreshItem();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleAudioStartPause(AudioStartPauseEvent startPauseEvent){
+        Log.d(TAG, "handleAudioStartPause: ");
+        updateStartAndPause(startPauseEvent.getIsPause());
+    }
+
     private void updateProgress(float progress){
         if (canUpdate) {
             sb_progress.setProgress((int) (progress * 1000));
         }
     }
 
-    private void updateStartAndPause(){
-        if (AudioPlayerService.isPlaying){
+    private void updateStartAndPause(boolean isPause){
+        if (isPause){
+            makeToast("PAUSE");
             btn_play_pause.setText("PAUSE");
         }else {
+            makeToast("START");
             btn_play_pause.setText("START");
         }
     }
@@ -132,7 +141,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 }else {
                     EventBus.getDefault().post(new AudioEvent(-1, AudioEvent.AUDIO_PLAY));
                 }
-                updateStartAndPause();
                 break;
             case R.id.btn_next:
 //                mAudioPlayer.stop();
@@ -189,7 +197,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-        PlayListAudioDaoManager.getInstance().closeConnection();
-        LocalAudioDaoManager.getInstance().closeConnection();
+        MyApplication.closeDB();
     }
 }
