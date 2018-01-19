@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -32,17 +33,21 @@ import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.service.AudioPlayerService;
+import yanzhikai.simpleplayer.ui.PlayListFragment;
 import yanzhikai.simpleplayer.ui.ScanActivity;
 
 import static yanzhikai.simpleplayer.event.AudioEvent.AUDIO_PLAY_CHOSEN;
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener{
     public static final String TAG = "yjkMainActivity";
-    private Button btn_pre, btn_play_pause, btn_next,btn_choose;
+    private static final String PLAY_LIST_FRAGMENT_TAG = "PlayListFragment";
+    private static final String PLAY_LIST_FRAGMENT_NAME = "PlayList";
+    private ImageView btn_pre, btn_play_pause, btn_next;
+    private Button btn_choose;
     private SeekBar sb_progress;
-    private RecyclerView rv_play_list;
-    private PlayListAdapter mPlayListAdapter;
     private boolean canUpdate = true;
+//    private RecyclerView rv_play_list;
+//    private PlayListAdapter mPlayListAdapter;
     private LinearLayout ly_play_list;
 
     @Override
@@ -53,13 +58,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         EventBus.getDefault().register(this);
         initView();
-
+        loadPlayListFragment();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateList();
+//        updateList();
+
     }
 
     private void initView() {
@@ -77,13 +83,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         sb_progress.setMax(1000);
         sb_progress.setOnSeekBarChangeListener(new MyProgressListener());
 
-        rv_play_list = findViewById(R.id.rv_play_list);
-        rv_play_list.setLayoutManager(new LinearLayoutManager(this));
-        DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-        mPlayListAdapter = new PlayListAdapter(this, PlayList.getInstance().getAudioList());
-        mPlayListAdapter.setListener(new MyPlayListListener());
-        rv_play_list.setAdapter(mPlayListAdapter);
-        rv_play_list.addItemDecoration(divider);
+//        rv_play_list = findViewById(R.id.rv_play_list);
+//        rv_play_list.setLayoutManager(new LinearLayoutManager(this));
+//        DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+//        mPlayListAdapter = new PlayListAdapter(this, PlayList.getInstance().getAudioList());
+//        mPlayListAdapter.setListener(new MyPlayListListener());
+//        rv_play_list.setAdapter(mPlayListAdapter);
+//        rv_play_list.addItemDecoration(divider);
 
     }
 
@@ -112,7 +118,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                mPlayListAdapter.notifyDataSetChanged();
+//                mPlayListAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -134,11 +140,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         updateProgress(event.progress);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void handleAudioChanged(AudioChangedEvent changedEvent){
-        mPlayListAdapter.refreshItem();
-        rv_play_list.smoothScrollToPosition(PlayList.getInstance().getCurrentIndex());
-    }
+//    @Subscribe(threadMode = ThreadMode.MAIN)
+//    public void handleAudioChanged(AudioChangedEvent changedEvent){
+//        mPlayListAdapter.refreshItem();
+//        rv_play_list.smoothScrollToPosition(PlayList.getInstance().getCurrentIndex());
+//    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleAudioStartPause(AudioStartPauseEvent startPauseEvent){
@@ -154,9 +160,9 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private void updateStartAndPause(boolean isPause){
         if (isPause){
-            btn_play_pause.setText("PAUSE");
+            btn_play_pause.setImageResource(R.mipmap.pause);
         }else {
-            btn_play_pause.setText("START");
+            btn_play_pause.setImageResource(R.mipmap.play);
         }
     }
 //    @Subscribe(threadMode = ThreadMode.MAIN)
@@ -169,12 +175,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //        }
 //    }
 
-    private void updateList(){
-        Log.d(TAG, "updateList: ");
-        PlayList.getInstance().add(LocalAudioDaoManager.getInstance().queryAllAudio());
-//        PlayListAudioDaoManager.getInstance().insertMultiAudio(LocalAudioDaoManager.getInstance().queryAllAudio());
-        mPlayListAdapter.notifyDataSetChanged();
-    }
+//    private void updateList(){
+//        Log.d(TAG, "updateList: ");
+//        PlayList.getInstance().add(LocalAudioDaoManager.getInstance().queryAllAudio());
+////        PlayListAudioDaoManager.getInstance().insertMultiAudio(LocalAudioDaoManager.getInstance().queryAllAudio());
+//        mPlayListAdapter.notifyDataSetChanged();
+//    }
 
     @Override
     public void onClick(View v) {
@@ -210,13 +216,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-    private class MyPlayListListener implements PlayListAdapter.PlayListItemOnClickListener {
-        @Override
-        public void onItemClick(AudioInfo info, int index) {
-            Log.d(TAG, "onItemClick: " + info.getSongName());
-            EventBus.getDefault().post(new AudioEvent(index,AUDIO_PLAY_CHOSEN));
-        }
-    }
+//    private class MyPlayListListener implements PlayListAdapter.PlayListItemOnClickListener {
+//        @Override
+//        public void onItemClick(AudioInfo info, int index) {
+//            Log.d(TAG, "onItemClick: " + info.getSongName());
+//            EventBus.getDefault().post(new AudioEvent(index,AUDIO_PLAY_CHOSEN));
+//        }
+//    }
 
     private class MyProgressListener implements SeekBar.OnSeekBarChangeListener{
 
@@ -241,19 +247,20 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-//    public void loadFragment(Fragment fragment, String tag, String name) {
-//        Fragment newFragment = getSupportFragmentManager().findFragmentByTag(tag);
-//        if (newFragment == null) {
-//            FragmentTransaction transaction = getSupportFragmentManager()
-//                    .beginTransaction()
-//                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-//                    .add(R.id.content_layout, fragment, tag);
-//            transaction.addToBackStack(name);
-//            transaction.commit();
-//        } else {
-//            getSupportFragmentManager().popBackStack(ROOT_NAME, 0);
-//        }
-//    }
+    public void loadPlayListFragment() {
+        Fragment newFragment = getSupportFragmentManager().findFragmentByTag(PLAY_LIST_FRAGMENT_TAG);
+        if (newFragment == null) {
+            Fragment fragment = new PlayListFragment();
+            FragmentTransaction transaction = getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                    .replace(R.id.ly_play_list, fragment, PLAY_LIST_FRAGMENT_TAG);
+//            transaction.addToBackStack(PLAY_LIST_FRAGMENT_NAME);
+            transaction.commit();
+        } else {
+            getSupportFragmentManager().popBackStack(PLAY_LIST_FRAGMENT_NAME, 0);
+        }
+    }
 
 
     @Override

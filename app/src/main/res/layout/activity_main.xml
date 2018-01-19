@@ -7,47 +7,95 @@
     tools:context="yanzhikai.simpleplayer.MainActivity">
 
 
-    <LinearLayout
-        android:id="@+id/ly_bottom"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal">
+        android:id="@+id/ly_control_bar"
+        >
 
-        <Button
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:id="@+id/btn_pre"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="PRE" />
+            android:src="@mipmap/previous"
+            android:layout_marginStart="50dp"
+            style="@style/AudioControlBarButton"
+            android:layout_centerVertical="true"
+            android:layout_alignParentStart="true"
+            />
 
-        <Button
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:id="@+id/btn_pause"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="START" />
+            android:src="@mipmap/play"
+            android:layout_toEndOf="@+id/btn_pre"
+            android:layout_marginStart="50dp"
+            style="@style/AudioControlBarButton"
+            android:layout_centerVertical="true"
+            />
 
-        <Button
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:id="@+id/btn_next"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="NEXT" />
+            android:src="@mipmap/next"
+            android:layout_toEndOf="@+id/btn_pause"
+            style="@style/AudioControlBarButton"
+            android:layout_marginStart="50dp"
+            android:layout_centerVertical="true"
+            />
 
         <Button
             android:id="@+id/btn_choose"
-            android:layout_width="match_parent"
+            android:layout_width="70dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_alignParentEnd="true"
             android:text="choose" />
-    </LinearLayout>
+    </RelativeLayout>
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/ly_bottom"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:orientation="horizontal">-->
+
+        <!--<Button-->
+            <!--android:id="@+id/btn_pre"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="PRE" />-->
+
+        <!--<Button-->
+            <!--android:id="@+id/btn_pause"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="START" />-->
+
+        <!--<Button-->
+            <!--android:id="@+id/btn_next"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="NEXT" />-->
+
+        <!--<Button-->
+            <!--android:id="@+id/btn_choose"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1"-->
+            <!--android:text="choose" />-->
+    <!--</LinearLayout>-->
 
     <SeekBar
         android:id="@+id/sb_progress"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:layout_above="@+id/ly_bottom"
+        android:layout_above="@+id/ly_control_bar"
         android:background="@android:color/holo_blue_light" />
 
     <LinearLayout
@@ -58,45 +106,43 @@
         android:layout_above="@+id/sb_progress"
         android:layout_marginBottom="30dp"
         android:background="@drawable/shadow_play_list"
-        android:translationZ="100dp"
-        android:elevation="-100dp"
         >
+        <!--android:translationZ="100dp"-->
+        <!--android:elevation="-100dp"-->
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:translationZ="10dp"
-            android:elevation="10dp"
-            >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_playlist_title"
-                android:text="@string/play_list_title"
-                android:layout_margin="40dp"
-                style="@style/AudioListTitleText"
-                android:layout_centerVertical="true"
-                />
+        <!--<RelativeLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="40dp"-->
+            <!--&gt;-->
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:id="@+id/tv_playlist_title"-->
+                <!--android:text="@string/play_list_title"-->
+                <!--android:layout_margin="40dp"-->
+                <!--style="@style/AudioListTitleText"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--/>-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_edit"
-                android:layout_marginEnd="20dp"
-                android:text="@string/play_list_edit"
-                style="@style/AudioListEditText"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                />
-        </RelativeLayout>
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:id="@+id/tv_edit"-->
+                <!--android:layout_marginEnd="20dp"-->
+                <!--android:text="@string/play_list_edit"-->
+                <!--style="@style/AudioListEditText"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--/>-->
+        <!--</RelativeLayout>-->
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_play_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical"
-            android:translationZ="5dp">
-        </android.support.v7.widget.RecyclerView>
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/rv_play_list"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:scrollbars="vertical"-->
+            <!--android:translationZ="5dp">-->
+        <!--</android.support.v7.widget.RecyclerView>-->
 
     </LinearLayout>
 </RelativeLayout>
