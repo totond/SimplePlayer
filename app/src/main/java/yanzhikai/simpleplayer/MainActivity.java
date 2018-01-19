@@ -1,14 +1,20 @@
 package yanzhikai.simpleplayer;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -37,6 +43,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private RecyclerView rv_play_list;
     private PlayListAdapter mPlayListAdapter;
     private boolean canUpdate = true;
+    private LinearLayout ly_play_list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +68,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         btn_next = findViewById(R.id.btn_next);
         btn_choose = findViewById(R.id.btn_choose);
         sb_progress = findViewById(R.id.sb_progress);
+        ly_play_list = findViewById(R.id.ly_play_list);
+
         btn_pre.setOnClickListener(this);
         btn_play_pause.setOnClickListener(this);
         btn_next.setOnClickListener(this);
@@ -76,6 +85,48 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         rv_play_list.setAdapter(mPlayListAdapter);
         rv_play_list.addItemDecoration(divider);
 
+    }
+
+    private void smaller(){
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) ly_play_list.getLayoutParams();
+        ValueAnimator valueAnimator;
+        if (layoutParams.width > 800) {
+            valueAnimator = ValueAnimator.ofInt(1280, 600);
+        }else {
+            valueAnimator = ValueAnimator.ofInt(600, 1280);
+        }
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) ly_play_list.getLayoutParams();
+                layoutParams.width = (int) animation.getAnimatedValue();
+                ly_play_list.setLayoutParams(layoutParams);
+
+            }
+        });
+        valueAnimator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mPlayListAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+        valueAnimator.setDuration(1000);
+        valueAnimator.start();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -103,10 +154,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private void updateStartAndPause(boolean isPause){
         if (isPause){
-            makeToast("PAUSE");
             btn_play_pause.setText("PAUSE");
         }else {
-            makeToast("START");
             btn_play_pause.setText("START");
         }
     }
@@ -155,7 +204,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             case R.id.btn_choose:
 //                mAudioPlayer.setPath("/storage/emulated/0/Music/陈奕迅 - 陀飞轮.mp3");
 //                mAudioPlayer.prepareAsync();
-                startActivity(new Intent(this, ScanActivity.class));
+//                startActivity(new Intent(this, ScanActivity.class));
+                smaller();
                 break;
         }
     }
@@ -191,9 +241,20 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-    private void makeToast(String str){
-        Toast.makeText(this,str,Toast.LENGTH_LONG).show();
-    }
+//    public void loadFragment(Fragment fragment, String tag, String name) {
+//        Fragment newFragment = getSupportFragmentManager().findFragmentByTag(tag);
+//        if (newFragment == null) {
+//            FragmentTransaction transaction = getSupportFragmentManager()
+//                    .beginTransaction()
+//                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+//                    .add(R.id.content_layout, fragment, tag);
+//            transaction.addToBackStack(name);
+//            transaction.commit();
+//        } else {
+//            getSupportFragmentManager().popBackStack(ROOT_NAME, 0);
+//        }
+//    }
+
 
     @Override
     protected void onDestroy() {
