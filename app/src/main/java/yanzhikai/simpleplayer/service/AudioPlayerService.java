@@ -107,9 +107,9 @@ public class AudioPlayerService extends Service {
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.mipmap.ic_launcher);
 
-        mNotificationRemoteViews.setOnClickPendingIntent(R.id.iv_play_pause,pIntentPlay);
-        mNotificationRemoteViews.setOnClickPendingIntent(R.id.iv_pre,pIntentPre);
-        mNotificationRemoteViews.setOnClickPendingIntent(R.id.iv_next,pIntentNext);
+        mNotificationRemoteViews.setOnClickPendingIntent(R.id.iv_play_pause, pIntentPlay);
+        mNotificationRemoteViews.setOnClickPendingIntent(R.id.iv_pre, pIntentPre);
+        mNotificationRemoteViews.setOnClickPendingIntent(R.id.iv_next, pIntentNext);
 
 
         mNotification = builder.build(); // 获取构建好的Notification
@@ -127,7 +127,7 @@ public class AudioPlayerService extends Service {
         filter.addAction(ACTION_PRE);
 
         mPlayerReceiver = new PlayerReceiver();
-        registerReceiver(mPlayerReceiver,filter);
+        registerReceiver(mPlayerReceiver, filter);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class AudioPlayerService extends Service {
         unregisterReceiver(mPlayerReceiver);
     }
 
-    private void playStart(){
+    private void playStart() {
         if (isPrepared) {
             mAudioPlayer.start();
         }
@@ -149,7 +149,7 @@ public class AudioPlayerService extends Service {
         updateNotification();
     }
 
-    private void playPause(){
+    private void playPause() {
         mAudioPlayer.pause();
         stopPlayingThread();
         isPlaying = false;
@@ -182,13 +182,18 @@ public class AudioPlayerService extends Service {
         updateNotification();
     }
 
-    private void updateNotification(){
-        if (isPlaying){
-            mNotificationRemoteViews.setImageViewResource(R.id.iv_play_pause,R.mipmap.pause);
-        }else {
-            mNotificationRemoteViews.setImageViewResource(R.id.iv_play_pause,R.mipmap.play);
+    private void updateNotification() {
+        if (isPlaying) {
+            mNotificationRemoteViews.setImageViewResource(R.id.iv_play_pause, R.mipmap.pause);
+        } else {
+            mNotificationRemoteViews.setImageViewResource(R.id.iv_play_pause, R.mipmap.play);
         }
-
+        AudioInfo audioInfo = PlayList.getInstance().getCurrentAudio();
+        if (audioInfo != null) {
+            mNotificationRemoteViews.setTextViewText(R.id.tv_title, audioInfo.getSongName());
+        } else {
+            mNotificationRemoteViews.setTextViewText(R.id.tv_title, getResources().getString(R.string.string_welcome));
+        }
         startForeground(NOTIFICATION_ID, mNotification);
     }
 
@@ -222,6 +227,7 @@ public class AudioPlayerService extends Service {
                 notifyAudioChanged();
                 isPlaying = true;
                 EventBus.getDefault().post(new AudioStartPauseEvent(true));
+                updateNotification();
                 break;
             case AudioEvent.AUDIO_SEEK_START:
                 if (mAudioPlayer.isPlaying()) {
@@ -230,8 +236,11 @@ public class AudioPlayerService extends Service {
                 break;
             case AudioEvent.AUDIO_SEEK_TO:
 //                if (mAudioPlayer.isPlaying()) {
-                Log.i(TAG, "seek to: " + (long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
-                mAudioPlayer.seekTo((long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
+                AudioInfo audioInfo = PlayList.getInstance().getCurrentAudio();
+                if (audioInfo != null) {
+                    Log.i(TAG, "seek to: " + (long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
+                    mAudioPlayer.seekTo((long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
+                }
 //                }
                 break;
         }
@@ -244,9 +253,9 @@ public class AudioPlayerService extends Service {
 
     private void handlePlayingDetail() {
         if (!isSeeking) {
-            CurrentAudioDetailEvent detailEvent = new CurrentAudioDetailEvent();
             AudioInfo currentInfo = PlayList.getInstance().getCurrentAudio();
             if (currentInfo != null) {
+                CurrentAudioDetailEvent detailEvent = new CurrentAudioDetailEvent();
                 detailEvent.durationText = currentInfo.getDurationText();
                 detailEvent.progress = (float) mAudioPlayer.getCurrentPosition() / currentInfo.getDuration();
                 detailEvent.currentTimeText = MediaUtil.parseTimeToString((int) (currentInfo.getDuration() * detailEvent.progress));
@@ -386,18 +395,18 @@ public class AudioPlayerService extends Service {
     }
 
 
-    public class PlayerReceiver extends BroadcastReceiver{
+    public class PlayerReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() != null) {
                 switch (intent.getAction()) {
                     case ACTION_PLAY_PAUSE:
-                        if (mAudioPlayer.isPlaying()){
+                        if (mAudioPlayer.isPlaying()) {
                             playPause();
-                            ToastUtil.makeShortToast(AudioPlayerService.this,"playPause");
-                        }else {
-                            ToastUtil.makeShortToast(AudioPlayerService.this,"playStart");
+                            ToastUtil.makeShortToast(AudioPlayerService.this, "playPause");
+                        } else {
+                            ToastUtil.makeShortToast(AudioPlayerService.this, "playStart");
                             playStart();
                         }
                         break;

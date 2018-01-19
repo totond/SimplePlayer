@@ -43,6 +43,7 @@ public class AudioInfo implements Serializable {
     @Id(autoincrement = true)
     private Long _id;
 
+    private int index;
 
     /**
      * 歌曲名称
@@ -105,13 +106,14 @@ public class AudioInfo implements Serializable {
 
     }
 
-    @Generated(hash = 1838736429)
-    public AudioInfo(Long _id, String songName, String singerName, String hash,
-            String fileExt, long fileSize, String fileSizeText, String filePath,
-            long duration, String durationText, String downloadUrl,
+    @Generated(hash = 1162702549)
+    public AudioInfo(Long _id, int index, String songName, String singerName,
+            String hash, String fileExt, long fileSize, String fileSizeText,
+            String filePath, long duration, String durationText, String downloadUrl,
             String createTime, int status, int type, String category,
             String childCategory) {
         this._id = _id;
+        this.index = index;
         this.songName = songName;
         this.singerName = singerName;
         this.hash = hash;
@@ -276,5 +278,13 @@ public class AudioInfo implements Serializable {
 
     public void set_id(Long _id) {
         this._id = _id;
+    }
+
+    public int getIndex() {
+        return this.index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }

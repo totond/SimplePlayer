@@ -9,11 +9,24 @@
     >
 
     <TextView
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_index"
+        android:gravity="center"
+        android:layout_alignParentLeft="true"
+        android:textSize="24sp"
+        android:layout_centerVertical="true"
+        android:text="1"
+        />
+
+    <TextView
         android:id="@+id/tv_song_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_toRightOf="@+id/tv_index"
+        android:layout_marginStart="4dp"
         android:layout_marginTop="8dp"
+        style="@style/AudioListSongNameText"
         android:text="未知"
          />
 
@@ -22,7 +35,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="4dp"
+        style="@style/AudioListSingerNameText"
+        android:layout_toRightOf="@+id/tv_index"
         android:text="未知name"
         android:layout_below="@+id/tv_song_name"/>
 
@@ -30,7 +45,9 @@
         android:id="@+id/tv_duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
         android:text="未知time"
+        style="@style/AudioListDurationText"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true" />
 </RelativeLayout>

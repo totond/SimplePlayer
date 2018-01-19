@@ -17,6 +17,8 @@ public class PlayingAudioInfo {
     private Long _id;
 
 
+    private int index;
+
     /**
      * 歌曲名称
      */
@@ -54,12 +56,13 @@ public class PlayingAudioInfo {
      */
     private long currentTime;
     private String currentTimeText;
-    @Generated(hash = 1208843285)
-    public PlayingAudioInfo(Long _id, String songName, String singerName,
+    @Generated(hash = 824445100)
+    public PlayingAudioInfo(Long _id, int index, String songName, String singerName,
             String hash, String fileExt, long fileSize, String fileSizeText,
             String filePath, long duration, String durationText, long currentTime,
             String currentTimeText) {
         this._id = _id;
+        this.index = index;
         this.songName = songName;
         this.singerName = singerName;
         this.hash = hash;
@@ -159,5 +162,13 @@ public class PlayingAudioInfo {
     }
     public void setCurrentTimeText(String currentTimeText) {
         this.currentTimeText = currentTimeText;
+    }
+
+    public int getIndex() {
+        return this.index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }

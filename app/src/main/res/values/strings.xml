@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">SimplePlayer</string>
+
+    <string name="string_welcome">Welcome to Simple Player</string>
+
+    <string name="play_list_title">播放列表</string>
+    <string name="play_list_edit">编辑</string>
+    <string name="play_list_edit_completed">完成</string>
 </resources>

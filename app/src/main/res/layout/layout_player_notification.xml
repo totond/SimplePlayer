@@ -11,9 +11,10 @@
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Welcome to Simple Player！"
-        android:textSize="24sp"
+        android:layout_marginStart="20dp"
+        android:text="@string/string_welcome"
+        android:textColor="@android:color/black"
+        android:textSize="22sp"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="16dp" />
 

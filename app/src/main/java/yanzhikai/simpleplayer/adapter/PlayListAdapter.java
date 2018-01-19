@@ -49,6 +49,7 @@ public class PlayListAdapter extends RecyclerView.Adapter {
         playListViewHolder.tv_duration.setText(mAudioInfos.get(position).getDurationText());
         playListViewHolder.audioIndex = position;
         playListViewHolder.audioInfo = mAudioInfos.get(position);
+        playListViewHolder.tv_index.setText(String.valueOf(position));
         if (position == PlayList.getInstance().getCurrentIndex()){
             playListViewHolder.itemView.setBackgroundResource(R.drawable.background_play_list_playing_item);
         }else {
@@ -62,7 +63,7 @@ public class PlayListAdapter extends RecyclerView.Adapter {
     }
 
     private class PlayListViewHolder extends RecyclerView.ViewHolder{
-        public TextView tv_song_name,tv_singer_name,tv_duration;
+        public TextView tv_song_name,tv_singer_name,tv_duration,tv_index;
         public AudioInfo audioInfo;
         public int audioIndex;
         public View itemView;
@@ -73,6 +74,7 @@ public class PlayListAdapter extends RecyclerView.Adapter {
             tv_song_name = itemView.findViewById(R.id.tv_song_name);
             tv_singer_name = itemView.findViewById(R.id.tv_singer_name);
             tv_duration = itemView.findViewById(R.id.tv_duration);
+            tv_index = itemView.findViewById(R.id.tv_index);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
