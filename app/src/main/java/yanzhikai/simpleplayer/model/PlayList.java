@@ -1,5 +1,7 @@
 package yanzhikai.simpleplayer.model;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +17,7 @@ import yanzhikai.simpleplayer.db.PlayListAudioDaoManager;
  */
 
 public class PlayList {
+    public static final String TAG = "yjkPlayList";
     public static final int PLAY_ORDER = 0;
     public static final int PLAY_RANDOM = 1;
     public static final int PLAY_SINGLE = 2;
@@ -33,6 +36,8 @@ public class PlayList {
 
     private void initData() {
         mAudioList = new ArrayList<>(PlayListAudioDaoManager.getInstance().queryAllAudio());
+        setCurrentIndex(PlayListAudioDaoManager.getInstance().queryPlayingAudio().get(0).getIndex());
+        Log.e(TAG, "initData:  当前是"+mCurrentIndex);
     }
 
     private static final PlayList instance = new PlayList();
@@ -93,6 +98,7 @@ public class PlayList {
         PlayingAudioInfo playingAudioInfo = new PlayingAudioInfo(audioInfo);
         playingAudioInfo.setCurrentTime(0);
         playingAudioInfo.setCurrentTimeText("00:00");
+        playingAudioInfo.setIndex(index);
         PlayListAudioDaoManager.getInstance().setPlayingAudio(playingAudioInfo);
         mCurrentIndex = index;
         mCurrentAudio = audioInfo;

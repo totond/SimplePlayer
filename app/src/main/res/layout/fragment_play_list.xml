@@ -26,6 +26,7 @@
             android:id="@+id/tv_edit"
             android:layout_marginEnd="20dp"
             android:text="@string/play_list_edit"
+            android:background="@drawable/background_btn"
             style="@style/AudioListEditText"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"

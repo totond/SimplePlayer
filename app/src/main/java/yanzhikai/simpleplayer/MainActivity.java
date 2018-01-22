@@ -87,7 +87,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //        rv_play_list.setLayoutManager(new LinearLayoutManager(this));
 //        DividerItemDecoration divider = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
 //        mPlayListAdapter = new PlayListAdapter(this, PlayList.getInstance().getAudioList());
-//        mPlayListAdapter.setListener(new MyPlayListListener());
+//        mPlayListAdapter.setOnClickListener(new MyPlayListListener());
 //        rv_play_list.setAdapter(mPlayListAdapter);
 //        rv_play_list.addItemDecoration(divider);
 
@@ -211,7 +211,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //                mAudioPlayer.setPath("/storage/emulated/0/Music/陈奕迅 - 陀飞轮.mp3");
 //                mAudioPlayer.prepareAsync();
 //                startActivity(new Intent(this, ScanActivity.class));
-                smaller();
+//                smaller();
+
                 break;
         }
     }

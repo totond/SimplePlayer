@@ -247,7 +247,7 @@ public class PlayListAudioDaoManager {
     }
 
     /**
-     * 查询所有记录
+     * 查询所有Playing记录
      * @return
      */
     public List<PlayingAudioInfo> queryPlayingAudio(){
