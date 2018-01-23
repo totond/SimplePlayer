@@ -70,7 +70,7 @@ public class PlayList {
     }
 
     public boolean remove(AudioInfo info) {
-        if (!isExist(info)) {
+        if (isExist(info)) {
             PlayListAudioDaoManager.getInstance().deleteAudio(info);
             return mAudioList.remove(info);
         }

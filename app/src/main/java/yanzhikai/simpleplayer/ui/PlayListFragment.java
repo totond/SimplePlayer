@@ -16,6 +16,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.adapter.PlayListAdapter;
 import yanzhikai.simpleplayer.db.LocalAudioDaoManager;
@@ -34,7 +38,7 @@ import static yanzhikai.simpleplayer.event.AudioEvent.AUDIO_PLAY_CHOSEN;
 public class PlayListFragment extends Fragment {
     private RecyclerView rv_play_list;
     private PlayListAdapter mPlayListAdapter;
-    private TextView tv_edit;
+    private TextView tv_edit,tv_delete;
 
     public PlayListFragment() {
         // Required empty public constructor
@@ -71,17 +75,29 @@ public class PlayListFragment extends Fragment {
                 if (mPlayListAdapter.getEditMode()){
                     updateEditMode(true);
                     mPlayListAdapter.setEditMode(false);
-                    ToastUtil.makeShortToast(PlayListFragment.this.getContext(),"选择了"+mPlayListAdapter.getSelectedItem().size());
+//                    ToastUtil.makeShortToast(PlayListFragment.this.getContext(),"选择了"+mPlayListAdapter.getSelectedItem().size());
                 }else {
                     updateEditMode(false);
+                    mPlayListAdapter.clearSelected();
                     mPlayListAdapter.setEditMode(true);
                 }
 
-
-
                 mPlayListAdapter.notifyDataSetChanged();
+            }
+        });
 
-
+        tv_delete = rootView.findViewById(R.id.tv_delete);
+        tv_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ArrayList<AudioInfo> deleteList = mPlayListAdapter.getSelectedItem();
+                boolean flag = true;
+                for (AudioInfo audioInfo : deleteList) {
+                    flag &= PlayList.getInstance().remove(audioInfo);
+                }
+                mPlayListAdapter.clearSelected();
+                mPlayListAdapter.notifyDataSetChanged();
+                ToastUtil.makeShortToast(PlayListFragment.this.getContext(),"删除了"+deleteList.size() + "首歌" + flag);
             }
         });
         handleAudioChanged();
@@ -105,15 +121,17 @@ public class PlayListFragment extends Fragment {
     }
 
     private void updateList(){
-        PlayList.getInstance().add(LocalAudioDaoManager.getInstance().queryAllAudio());
+//        PlayList.getInstance().add(LocalAudioDaoManager.getInstance().queryAllAudio());
 //        PlayListAudioDaoManager.getInstance().insertMultiAudio(LocalAudioDaoManager.getInstance().queryAllAudio());
-        mPlayListAdapter.notifyDataSetChanged();
+//        mPlayListAdapter.notifyDataSetChanged();
     }
 
     private void updateEditMode(boolean isEditing){
         if (isEditing){
+            tv_delete.setVisibility(View.INVISIBLE);
             tv_edit.setText(R.string.play_list_edit);
         }else {
+            tv_delete.setVisibility(View.VISIBLE);
             tv_edit.setText(R.string.play_list_edit_completed);
         }
     }

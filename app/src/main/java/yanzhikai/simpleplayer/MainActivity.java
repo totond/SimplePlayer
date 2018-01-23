@@ -59,6 +59,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         EventBus.getDefault().register(this);
         initView();
         loadPlayListFragment();
+
     }
 
     @Override

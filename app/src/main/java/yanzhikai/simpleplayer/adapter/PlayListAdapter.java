@@ -50,6 +50,10 @@ public class PlayListAdapter extends RecyclerView.Adapter {
         return mSelectedPositions.get(position);
     }
 
+    public void clearSelected(){
+        mSelectedPositions.clear();
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.d(TAG, "onCreateViewHolder: ");
@@ -146,8 +150,8 @@ public class PlayListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public LinkedList<AudioInfo> getSelectedItem() {
-        LinkedList<AudioInfo> selectList = new LinkedList<>();
+    public ArrayList<AudioInfo> getSelectedItem() {
+        ArrayList<AudioInfo> selectList = new ArrayList<>();
         for (int i = 0; i < mAudioInfos.size(); i++) {
             if (isItemChecked(i)) {
                 selectList.add(mAudioInfos.get(i));

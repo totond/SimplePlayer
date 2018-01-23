@@ -23,6 +23,19 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/tv_delete"
+            android:visibility="invisible"
+            android:layout_marginEnd="20dp"
+            android:text="@string/play_list_delete"
+            android:background="@drawable/background_btn"
+            style="@style/AudioListEditText"
+            android:layout_toStartOf="@+id/tv_edit"
+            android:layout_centerVertical="true"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/tv_edit"
             android:layout_marginEnd="20dp"
             android:text="@string/play_list_edit"
