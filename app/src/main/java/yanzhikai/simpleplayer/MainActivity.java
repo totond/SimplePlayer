@@ -23,7 +23,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.List;
+
 import yanzhikai.simpleplayer.adapter.PlayListAdapter;
+import yanzhikai.simpleplayer.db.AudioListDaoManager;
 import yanzhikai.simpleplayer.db.LocalAudioDaoManager;
 import yanzhikai.simpleplayer.db.PlayListAudioDaoManager;
 import yanzhikai.simpleplayer.event.AudioChangedEvent;
@@ -31,10 +34,12 @@ import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.event.AudioStartPauseEvent;
 import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
+import yanzhikai.simpleplayer.model.AudioListInfo;
 import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.service.AudioPlayerService;
 import yanzhikai.simpleplayer.ui.PlayListFragment;
 import yanzhikai.simpleplayer.ui.ScanActivity;
+import yanzhikai.simpleplayer.utils.ToastUtil;
 
 import static yanzhikai.simpleplayer.event.AudioEvent.AUDIO_PLAY_CHOSEN;
 
@@ -91,7 +96,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //        mPlayListAdapter.setOnClickListener(new MyPlayListListener());
 //        rv_play_list.setAdapter(mPlayListAdapter);
 //        rv_play_list.addItemDecoration(divider);
-
+        testAudioList();
     }
 
     private void smaller(){
@@ -211,11 +216,33 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             case R.id.btn_choose:
 //                mAudioPlayer.setPath("/storage/emulated/0/Music/陈奕迅 - 陀飞轮.mp3");
 //                mAudioPlayer.prepareAsync();
-//                startActivity(new Intent(this, ScanActivity.class));
+                startActivity(new Intent(this, ScanActivity.class));
 //                smaller();
 
                 break;
         }
+    }
+
+    private void testAudioList(){
+//        AudioListDaoManager.getInstance().init(this);
+
+        //新建
+        AudioListInfo audioListInfo = new AudioListInfo();
+        audioListInfo.setAudioListName("TestList1");
+//        AudioListDaoManager.getInstance().insertList(audioListInfo);
+
+        //修改
+        AudioListInfo audioListInfo1 = AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").get(0);
+        audioListInfo1.getInfoList().addAll(LocalAudioDaoManager.getInstance().queryAllAudio());
+        Log.d(TAG, "testAudioList: pre size:" + audioListInfo1.getInfoList().size());
+        audioListInfo1.update();
+
+        //查询
+        List<AudioInfo> audioInfos = AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").get(0).getInfoList();
+        Log.d(TAG, "testAudioList:size " + AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").size());
+        Log.d(TAG, "testAudioList:id " + AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").get(0).get_id());
+        Log.d(TAG, "testAudioList:result " + audioInfos.size());
+        ToastUtil.makeShortToast(this,audioInfos.get(0).getSongName());
     }
 
 //    private class MyPlayListListener implements PlayListAdapter.PlayListItemOnClickListener {

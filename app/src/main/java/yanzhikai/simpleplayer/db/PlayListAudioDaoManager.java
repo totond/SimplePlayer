@@ -39,7 +39,6 @@ public class PlayListAudioDaoManager {
 
     public void init(Context context){
         mContext = context;
-        setDebug();
     }
 
     public DaoMaster getDaoMaster(){
@@ -203,9 +202,9 @@ public class PlayListAudioDaoManager {
      * 使用queryBuilder进行查询
      * @return
      */
-    public List<AudioInfo> queryAudioByQueryBuilder(long id){
+    public List<AudioInfo> queryAudioByQueryBuilder(String hash){
         QueryBuilder<AudioInfo> queryBuilder = getDaoSession().queryBuilder(AudioInfo.class);
-        return queryBuilder.where(AudioInfoDao.Properties._id.eq(id)).list();
+        return queryBuilder.where(AudioInfoDao.Properties.Hash.eq(hash)).list();
     }
 
     public boolean isExist(String hash){

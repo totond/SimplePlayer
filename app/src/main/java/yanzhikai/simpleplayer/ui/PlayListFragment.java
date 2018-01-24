@@ -112,7 +112,10 @@ public class PlayListFragment extends Fragment {
 
     private void handleAudioChanged(){
         mPlayListAdapter.refreshItem();
-        rv_play_list.smoothScrollToPosition(PlayList.getInstance().getCurrentIndex());
+        int index = PlayList.getInstance().getCurrentIndex();
+        if (index >= 0) {
+            rv_play_list.smoothScrollToPosition(PlayList.getInstance().getCurrentIndex());
+        }
     }
     @Override
     public void onResume() {

@@ -5,7 +5,7 @@
 
     <string name="play_list_title">播放列表</string>
     <string name="play_list_edit">编辑</string>
-    <string name="play_list_edit_completed">完成</string>
+    <string name="play_list_edit_completed">保存</string>
     <string name="play_list_delete">删除</string>
 
     <!-- TODO: Remove or change this placeholder text -->

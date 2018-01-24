@@ -36,7 +36,9 @@ public class PlayList {
 
     private void initData() {
         mAudioList = new ArrayList<>(PlayListAudioDaoManager.getInstance().queryAllAudio());
-        setCurrentIndex(PlayListAudioDaoManager.getInstance().queryPlayingAudio().get(0).getIndex());
+        if (PlayListAudioDaoManager.getInstance().queryPlayingAudio().size() > 0) {
+            setCurrentIndex(PlayListAudioDaoManager.getInstance().queryPlayingAudio().get(0).getIndex());
+        }
         Log.e(TAG, "initData:  当前是"+mCurrentIndex);
     }
 

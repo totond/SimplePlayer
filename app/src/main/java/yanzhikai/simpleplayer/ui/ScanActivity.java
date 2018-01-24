@@ -9,10 +9,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import java.util.List;
+
 import yanzhikai.simpleplayer.R;
+import yanzhikai.simpleplayer.db.AudioListDaoManager;
 import yanzhikai.simpleplayer.db.LocalAudioDaoManager;
 import yanzhikai.simpleplayer.model.AudioInfo;
+import yanzhikai.simpleplayer.model.AudioListInfo;
 import yanzhikai.simpleplayer.utils.MediaUtil;
+import yanzhikai.simpleplayer.utils.ToastUtil;
 
 public class ScanActivity extends Activity {
     public static final String TAG = "yjkScanActivity";
@@ -31,6 +36,7 @@ public class ScanActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
 
+        Log.d(TAG, "onCreate:Local size: " + AudioListDaoManager.getInstance().queryAllLocalAudio().size());
         btn_scan = findViewById(R.id.btn_scan);
         btn_scan.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,6 +46,7 @@ public class ScanActivity extends Activity {
         });
         pb_scan = findViewById(R.id.pb_scan);
         mHandler = new ScanHandler();
+//        testAudioList();
     }
 
     /**
@@ -62,6 +69,7 @@ public class ScanActivity extends Activity {
                         if (audioInfo != null) {
                             Log.d(TAG, "audioInfo: " + audioInfo.toString());
 //                            PlayList.getInstance().add(audioInfo);
+                            AudioListDaoManager.getInstance().insertLocalAudio(audioInfo);
                             LocalAudioDaoManager.getInstance().insertAudio(audioInfo);
                         }
 
@@ -79,7 +87,29 @@ public class ScanActivity extends Activity {
     }
 
     private boolean isExist(String hash){
-        return LocalAudioDaoManager.getInstance().isExist(hash);
+//        return LocalAudioDaoManager.getInstance().isExist(hash);
+        return AudioListDaoManager.getInstance().isExistInLocalList(hash);
+    }
+
+    private void testAudioList(){
+//        AudioListDaoManager.getInstance().init(this);
+
+        //新建
+        AudioListInfo audioListInfo = new AudioListInfo();
+        audioListInfo.setAudioListName("TestList1");
+        AudioListDaoManager.getInstance().insertList(audioListInfo);
+
+        //修改
+        AudioListInfo audioListInfo1 = AudioListDaoManager.getInstance().queryAllList().get(0);
+        audioListInfo1.getInfoList().addAll(LocalAudioDaoManager.getInstance().queryAllAudio());
+        Log.d(TAG, "testAudioList:1size " + audioListInfo1.getInfoList().size());
+        audioListInfo1.update();
+
+        //查询
+        List<AudioInfo> audioInfos = AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").get(0).getInfoList();
+        Log.d(TAG, "testAudioList:id " + AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").get(0).get_id());
+        Log.d(TAG, "testAudioList: " + audioInfos.get(0).getSongName());
+        ToastUtil.makeShortToast(this,audioInfos.get(0).getSongName());
     }
 
     private class ScanHandler extends Handler{
@@ -97,12 +127,18 @@ public class ScanActivity extends Activity {
                 case FINISH:
 //                    showFinishView();
                     Log.d(TAG, "handleMessage: FINISH");
+                    Log.d(TAG, "handle LocalAudioList: size: " + AudioListDaoManager.getInstance().queryAudioByQueryBuilder(AudioListDaoManager.LOCAL_LIST_NAME).size());
+                    AudioListDaoManager.getInstance().queryAudioByQueryBuilder(AudioListDaoManager.LOCAL_LIST_NAME).get(0).resetInfoList();
+                    Log.d(TAG, "handleMessage:count " + AudioListDaoManager.getInstance().queryAllLocalAudio().size());
+//                    Log.d(TAG, "testAudioList:id " + AudioListDaoManager.getInstance().queryAudioByQueryBuilder(AudioListDaoManager.LOCAL_LIST_NAME).get(0).getInfoList().get(0).getSongName());
                     pb_scan.setVisibility(View.INVISIBLE);
+                    testAudioList();
                     break;
 
             }
         }
     }
+
 
 
 
