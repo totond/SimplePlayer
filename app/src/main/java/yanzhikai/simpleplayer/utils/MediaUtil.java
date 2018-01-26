@@ -172,7 +172,7 @@ public class MediaUtil {
             audioInfo.setFilePath(filePath);
             audioInfo.setFileSize(fileSize);
             audioInfo.setFileSizeText(fileSizeText);
-            audioInfo.setHash(hash);
+            audioInfo.setAudioHash(hash);
             audioInfo.setSongName(songName);
             audioInfo.setSingerName(singerName);
             audioInfo.setType(AudioInfo.LOCAL);
@@ -275,7 +275,7 @@ public class MediaUtil {
                 audioInfo.setFilePath(filePath);
                 audioInfo.setFileSize(fileSize);
                 audioInfo.setFileSizeText(fileSizeText);
-                audioInfo.setHash(hash);
+                audioInfo.setAudioHash(hash);
                 audioInfo.setSongName(songName);
                 audioInfo.setSingerName(singerName);
                 audioInfo.setType(AudioInfo.LOCAL);

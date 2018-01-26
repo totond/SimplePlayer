@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import yanzhikai.simpleplayer.R;
@@ -17,7 +18,6 @@ import yanzhikai.simpleplayer.db.LocalAudioDaoManager;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.AudioListInfo;
 import yanzhikai.simpleplayer.utils.MediaUtil;
-import yanzhikai.simpleplayer.utils.ToastUtil;
 
 public class ScanActivity extends Activity {
     public static final String TAG = "yjkScanActivity";
@@ -30,6 +30,8 @@ public class ScanActivity extends Activity {
 
     private Handler mHandler;
 
+    private ArrayList<AudioInfo> audioInfos = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,18 +43,17 @@ public class ScanActivity extends Activity {
         btn_scan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                doScaningHandler();
+                doScanningHandler();
             }
         });
         pb_scan = findViewById(R.id.pb_scan);
         mHandler = new ScanHandler();
-//        testAudioList();
     }
 
     /**
      * 扫描
      */
-    private void doScaningHandler() {
+    private void doScanningHandler() {
         mHandler.sendEmptyMessage(SCANING);
         new Thread() {
             @Override
@@ -69,7 +70,8 @@ public class ScanActivity extends Activity {
                         if (audioInfo != null) {
                             Log.d(TAG, "audioInfo: " + audioInfo.toString());
 //                            PlayList.getInstance().add(audioInfo);
-                            AudioListDaoManager.getInstance().insertLocalAudio(audioInfo);
+                            AudioListDaoManager.getInstance().insertAudioToList(audioInfo,AudioListDaoManager.getInstance().getLocalListInfo());
+                            audioInfos.add(audioInfo);
                             LocalAudioDaoManager.getInstance().insertAudio(audioInfo);
                         }
 
@@ -86,31 +88,43 @@ public class ScanActivity extends Activity {
 
     }
 
+    //在AudioListDaoManager里面做了存在判断，这里不用做
     private boolean isExist(String hash){
-//        return LocalAudioDaoManager.getInstance().isExist(hash);
-        return AudioListDaoManager.getInstance().isExistInLocalList(hash);
+//        return LocalAudioDaoManager.getInstance().isAudioListExist(hash);
+//        return AudioListDaoManager.getInstance().isExistInLocalList(hash);
+        return false;
     }
 
-    private void testAudioList(){
-//        AudioListDaoManager.getInstance().init(this);
+//    private void testAudioList(){
+////        AudioListDaoManager.getInstance().init(this);
+//
+//        //新建
+//        AudioListInfo audioListInfo = new AudioListInfo();
+//        audioListInfo.setListName("TestList1");
+//        AudioListDaoManager.getInstance().insertList(audioListInfo);
+//
+//        //修改
+//        AudioListInfo audioListInfo1 = AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").get(0);
+//        Log.d(TAG, "testAudioList: pre pre size:" + audioListInfo1.getInfoList().size());
+//        audioListInfo1.getInfoList().addAll(LocalAudioDaoManager.getInstance().queryAllAudio());
+//        Log.d(TAG, "testAudioList: pre size:" + audioListInfo1.getInfoList().size());
+//        audioListInfo1.update();
+//        audioListInfo1.resetInfoList();
+////        AudioListDaoManager.getInstance().getDaoMaster().newSession().update(audioListInfo1);
+//        //查询
+//        queryTest();
+//
+//    }
 
-        //新建
-        AudioListInfo audioListInfo = new AudioListInfo();
-        audioListInfo.setAudioListName("TestList1");
-        AudioListDaoManager.getInstance().insertList(audioListInfo);
+//    private void queryTest(){
+//        //查询
+//        List<AudioInfo> audioInfos = AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").get(0).getInfoList();
+//        Log.d(TAG, "testAudioList:size " + AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").size());
+//        Log.d(TAG, "testAudioList:result " + audioInfos.size());
+////        ToastUtil.makeShortToast(this,audioInfos.get(0).getSongName());
+//        Log.d(TAG, "testAudioList: thread :" + Thread.currentThread().getName());
+//    }
 
-        //修改
-        AudioListInfo audioListInfo1 = AudioListDaoManager.getInstance().queryAllList().get(0);
-        audioListInfo1.getInfoList().addAll(LocalAudioDaoManager.getInstance().queryAllAudio());
-        Log.d(TAG, "testAudioList:1size " + audioListInfo1.getInfoList().size());
-        audioListInfo1.update();
-
-        //查询
-        List<AudioInfo> audioInfos = AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").get(0).getInfoList();
-        Log.d(TAG, "testAudioList:id " + AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").get(0).get_id());
-        Log.d(TAG, "testAudioList: " + audioInfos.get(0).getSongName());
-        ToastUtil.makeShortToast(this,audioInfos.get(0).getSongName());
-    }
 
     private class ScanHandler extends Handler{
         @Override
@@ -126,13 +140,15 @@ public class ScanActivity extends Activity {
                     break;
                 case FINISH:
 //                    showFinishView();
+                    AudioListDaoManager.getInstance().getLocalListInfo().getInfoList().addAll(audioInfos);
+                    AudioListDaoManager.getInstance().getLocalListInfo().update();
                     Log.d(TAG, "handleMessage: FINISH");
                     Log.d(TAG, "handle LocalAudioList: size: " + AudioListDaoManager.getInstance().queryAudioByQueryBuilder(AudioListDaoManager.LOCAL_LIST_NAME).size());
                     AudioListDaoManager.getInstance().queryAudioByQueryBuilder(AudioListDaoManager.LOCAL_LIST_NAME).get(0).resetInfoList();
                     Log.d(TAG, "handleMessage:count " + AudioListDaoManager.getInstance().queryAllLocalAudio().size());
 //                    Log.d(TAG, "testAudioList:id " + AudioListDaoManager.getInstance().queryAudioByQueryBuilder(AudioListDaoManager.LOCAL_LIST_NAME).get(0).getInfoList().get(0).getSongName());
                     pb_scan.setVisibility(View.INVISIBLE);
-                    testAudioList();
+//                    testAudioList();
                     break;
 
             }

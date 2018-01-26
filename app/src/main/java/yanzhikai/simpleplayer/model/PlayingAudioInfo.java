@@ -77,10 +77,10 @@ public class PlayingAudioInfo {
     }
 
     public PlayingAudioInfo(AudioInfo audioInfo){
-        this._id = audioInfo.get_id();
+//        this._id = audioInfo.get_id();
         this.songName = audioInfo.getSongName();
         this.singerName = audioInfo.getSingerName();
-        this.hash = audioInfo.getHash();
+        this.hash = audioInfo.getAudioHash();
         this.fileExt = audioInfo.getFileExt();
         this.fileSize = audioInfo.getFileSize();
         this.fileSizeText = audioInfo.getFileSizeText();

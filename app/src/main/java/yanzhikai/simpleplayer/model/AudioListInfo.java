@@ -2,14 +2,14 @@ package yanzhikai.simpleplayer.model;
 
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.JoinProperty;
+import org.greenrobot.greendao.annotation.JoinEntity;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.ToMany;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.annotation.Unique;
 import com.jian.greendao.gen.DaoSession;
 import com.jian.greendao.gen.AudioInfoDao;
 import com.jian.greendao.gen.AudioListInfoDao;
@@ -23,15 +23,17 @@ import com.jian.greendao.gen.AudioListInfoDao;
 
 @Entity(nameInDb = "AudioListInfo")
 public class AudioListInfo {
-    @Id(autoincrement = true)
-    private Long _id;
 
-    @NotNull
-    private String audioListName;
+    @Unique
+    @Id
+    private String listName;
 
-    @ToMany(joinProperties = {
-            @JoinProperty(name = "audioListName", referencedName = "hash")
-    })
+    @ToMany
+    @JoinEntity(
+            entity = JoinListWithAudio.class,
+            sourceProperty = "listName",
+            targetProperty = "audioHash"
+    )
     private List<AudioInfo> infoList;
 
     /** Used to resolve relations */
@@ -42,37 +44,28 @@ public class AudioListInfo {
     @Generated(hash = 2073011157)
     private transient AudioListInfoDao myDao;
 
-    @Generated(hash = 419640292)
-    public AudioListInfo(Long _id, @NotNull String audioListName) {
-        this._id = _id;
-        this.audioListName = audioListName;
+    @Generated(hash = 1898050267)
+    public AudioListInfo(String listName) {
+        this.listName = listName;
     }
 
     @Generated(hash = 1163217503)
     public AudioListInfo() {
     }
 
-    public Long get_id() {
-        return this._id;
+    public String getListName() {
+        return this.listName;
     }
 
-    public void set_id(Long _id) {
-        this._id = _id;
-    }
-
-    public String getAudioListName() {
-        return this.audioListName;
-    }
-
-    public void setAudioListName(String audioListName) {
-        this.audioListName = audioListName;
+    public void setListName(String listName) {
+        this.listName = listName;
     }
 
     /**
      * To-many relationship, resolved on first access (and after reset).
      * Changes to to-many relations are not persisted, make changes to the target entity.
      */
-    @Generated(hash = 1471684902)
+    @Generated(hash = 961170995)
     public List<AudioInfo> getInfoList() {
         if (infoList == null) {
             final DaoSession daoSession = this.daoSession;
@@ -81,7 +74,7 @@ public class AudioListInfo {
             }
             AudioInfoDao targetDao = daoSession.getAudioInfoDao();
             List<AudioInfo> infoListNew = targetDao
-                    ._queryAudioListInfo_InfoList(audioListName);
+                    ._queryAudioListInfo_InfoList(listName);
             synchronized (this) {
                 if (infoList == null) {
                     infoList = infoListNew;
@@ -89,23 +82,6 @@ public class AudioListInfo {
             }
         }
         return infoList;
-    }
-
-    public void insertAudio(AudioInfo audioInfo){
-        getInfoList().add(audioInfo);
-    }
-
-    //判断歌单是否存在此歌
-    public boolean isExist(String hash){
-        if (daoSession == null) {
-            throw new DaoException("Entity is detached from DAO context");
-        }
-        boolean flag = false;
-        for (AudioInfo info : getInfoList()){
-            flag |= info.getHash().equals(hash);
-        }
-        return flag;
-//        return (daoSession.getAudioInfoDao().queryBuilder().where(AudioInfoDao.Properties.Hash.eq(hash)).list().size() > 0);
     }
 
     /** Resets a to-many relationship, making the next get call to query for a fresh result. */
@@ -156,4 +132,7 @@ public class AudioListInfo {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getAudioListInfoDao() : null;
     }
+
+
+
 }

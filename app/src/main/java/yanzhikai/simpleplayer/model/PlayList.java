@@ -3,7 +3,6 @@ package yanzhikai.simpleplayer.model;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -93,7 +92,7 @@ public class PlayList {
     }
 
     public Boolean isExist(AudioInfo info) {
-        return PlayListAudioDaoManager.getInstance().isExist(info.getHash());
+        return PlayListAudioDaoManager.getInstance().isExist(info.getAudioHash());
     }
 
     public void setCurrentAudio(AudioInfo audioInfo,int index) {

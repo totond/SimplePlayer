@@ -196,18 +196,10 @@ public class LocalAudioDaoManager {
         return getDaoSession().queryRaw(AudioInfo.class, sql, conditions);
     }
 
-    /**
-     * 使用queryBuilder进行查询
-     * @return
-     */
-    public List<AudioInfo> queryAudioByQueryBuilder(long id){
-        QueryBuilder<AudioInfo> queryBuilder = getDaoSession().queryBuilder(AudioInfo.class);
-        return queryBuilder.where(AudioInfoDao.Properties._id.eq(id)).list();
-    }
 
     public boolean isExist(String hash){
         QueryBuilder<AudioInfo> queryBuilder = getDaoSession().queryBuilder(AudioInfo.class);
-        if(queryBuilder.where(AudioInfoDao.Properties.Hash.eq(hash)).list().size() > 0){
+        if(queryBuilder.where(AudioInfoDao.Properties.AudioHash.eq(hash)).list().size() > 0){
             return true;
         }else {
             return false;
