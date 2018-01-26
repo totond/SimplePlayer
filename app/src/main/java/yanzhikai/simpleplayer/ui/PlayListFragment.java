@@ -4,6 +4,7 @@ package yanzhikai.simpleplayer.ui;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,14 +18,11 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.adapter.PlayListAdapter;
-import yanzhikai.simpleplayer.db.LocalAudioDaoManager;
-import yanzhikai.simpleplayer.event.AudioChangedEvent;
 import yanzhikai.simpleplayer.event.AudioEvent;
+import yanzhikai.simpleplayer.event.PlayListChangedEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.utils.EventUtil;
@@ -38,35 +36,41 @@ import static yanzhikai.simpleplayer.event.AudioEvent.AUDIO_PLAY_CHOSEN;
 public class PlayListFragment extends Fragment {
     private RecyclerView rv_play_list;
     private PlayListAdapter mPlayListAdapter;
-    private TextView tv_edit,tv_delete;
+    private TextView tv_edit,tv_delete,tv_choose_all;
 
     public PlayListFragment() {
-        // Required empty public constructor
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EventUtil.register(this);
+
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         EventUtil.unregister(this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        EventUtil.register(this);
+
         View rootView = inflater.inflate(R.layout.fragment_play_list, container, false);
         rv_play_list = rootView.findViewById(R.id.rv_play_list);
         rv_play_list.setLayoutManager(new LinearLayoutManager(getContext()));
         DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         mPlayListAdapter = new PlayListAdapter(getContext(), PlayList.getInstance().getAudioList());
         mPlayListAdapter.setOnClickListener(new MyPlayListListener());
+        DefaultItemAnimator animator = new DefaultItemAnimator();
+        animator.setAddDuration(2000);
+        animator.setRemoveDuration(2000);
+        rv_play_list.setItemAnimator(animator);
         rv_play_list.setAdapter(mPlayListAdapter);
         rv_play_list.addItemDecoration(divider);
+
 
         tv_edit = rootView.findViewById(R.id.tv_edit);
         tv_edit.setOnClickListener(new View.OnClickListener() {
@@ -100,15 +104,19 @@ public class PlayListFragment extends Fragment {
                 ToastUtil.makeShortToast(PlayListFragment.this.getContext(),"删除了"+deleteList.size() + "首歌" + flag);
             }
         });
+
+        tv_choose_all = rootView.findViewById(R.id.tv_choose_all);
+        tv_choose_all.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPlayListAdapter.selectAllItems();
+            }
+        });
         handleAudioChanged();
         return rootView;
     }
 
-    //对切换歌曲做出的处理，滑动RecyclerView到相应位置
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void handleAudioChanged(AudioChangedEvent changedEvent){
-        handleAudioChanged();
-    }
+
 
     private void handleAudioChanged(){
         mPlayListAdapter.refreshItem();
@@ -117,6 +125,21 @@ public class PlayListFragment extends Fragment {
             rv_play_list.smoothScrollToPosition(PlayList.getInstance().getCurrentIndex());
         }
     }
+
+    //对切换歌曲做出的处理，滑动RecyclerView到相应位置
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleListChanged(PlayListChangedEvent playListChangedEvent){
+        switch (playListChangedEvent.getType()){
+            case PlayListChangedEvent.CURRENT_AUDIO_CHANGED:
+                handleAudioChanged();
+                break;
+            case PlayListChangedEvent.ITEM_ADDED:
+                mPlayListAdapter.notifyDataSetChanged();
+                rv_play_list.smoothScrollToPosition(mPlayListAdapter.getItemCount() - 1);
+                break;
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -132,9 +155,11 @@ public class PlayListFragment extends Fragment {
     private void updateEditMode(boolean isEditing){
         if (isEditing){
             tv_delete.setVisibility(View.INVISIBLE);
+            tv_choose_all.setVisibility(View.INVISIBLE);
             tv_edit.setText(R.string.play_list_edit);
         }else {
             tv_delete.setVisibility(View.VISIBLE);
+            tv_choose_all.setVisibility(View.VISIBLE);
             tv_edit.setText(R.string.play_list_edit_completed);
         }
     }

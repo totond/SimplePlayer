@@ -22,10 +22,10 @@ import yanzhikai.simpleplayer.AudioPlayerListener;
 import yanzhikai.simpleplayer.MainActivity;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.SimpleAudioPlayer;
-import yanzhikai.simpleplayer.event.AudioChangedEvent;
 import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.event.AudioStartPauseEvent;
 import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
+import yanzhikai.simpleplayer.event.PlayListChangedEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.utils.MediaUtil;
@@ -248,7 +248,7 @@ public class AudioPlayerService extends Service {
 
 
     private void notifyAudioChanged() {
-        EventBus.getDefault().post(new AudioChangedEvent());
+        EventBus.getDefault().post(new PlayListChangedEvent(PlayListChangedEvent.CURRENT_AUDIO_CHANGED));
     }
 
     private void handlePlayingDetail() {

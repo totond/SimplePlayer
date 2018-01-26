@@ -29,9 +29,21 @@
             android:text="@string/play_list_delete"
             android:background="@drawable/background_btn"
             style="@style/AudioListEditText"
-            android:layout_toStartOf="@+id/tv_edit"
+            android:layout_toStartOf="@+id/tv_choose_all"
             android:layout_centerVertical="true"
             />
+
+        <TextView
+            android:id="@+id/tv_choose_all"
+            style="@style/AudioListEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:layout_toStartOf="@+id/tv_edit"
+            android:background="@drawable/background_btn"
+            android:text="@string/play_list_choose_all"
+            android:visibility="invisible" />
 
         <TextView
             android:layout_width="wrap_content"

@@ -11,12 +11,11 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.List;
 
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.PlayList;
-import yanzhikai.simpleplayer.utils.ToastUtil;
 
 /**
  * author : yany
@@ -25,18 +24,18 @@ import yanzhikai.simpleplayer.utils.ToastUtil;
  * desc   :
  */
 
-public class PlayListAdapter extends RecyclerView.Adapter {
+public class LocalAudioListAdapter extends RecyclerView.Adapter {
     public static final String TAG = "yjkAdapter";
     private Context mContext;
-    private ArrayList<AudioInfo> mAudioInfos;
-    private PlayListItemOnClickListener mListener;
+    private List<AudioInfo> mAudioInfos;
+    private LocalListItemOnClickListener mListener;
     private int mCurrentIndex = -1;
 
     private boolean isEditMode = false;
     private SparseBooleanArray mSelectedPositions = new SparseBooleanArray();
     private ListOnSelectListener mSelectListener;
 
-    public PlayListAdapter(Context context, ArrayList<AudioInfo> audioInfos) {
+    public LocalAudioListAdapter(Context context, List<AudioInfo> audioInfos) {
         mContext = context;
         mAudioInfos = audioInfos;
     }
@@ -65,20 +64,20 @@ public class PlayListAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.d(TAG, "onCreateViewHolder: ");
         View view = LayoutInflater.from(mContext).inflate(R.layout.play_list_item, null, false);
-        return new PlayListViewHolder(view);
+        return new LocalAudioListViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        final PlayListViewHolder playListViewHolder = (PlayListViewHolder) holder;
-        playListViewHolder.tv_song_name.setText(mAudioInfos.get(position).getSongName());
-        playListViewHolder.tv_singer_name.setText(mAudioInfos.get(position).getSingerName());
-        playListViewHolder.tv_duration.setText(mAudioInfos.get(position).getDurationText());
-        playListViewHolder.tv_index.setText(String.valueOf(position));
-        playListViewHolder.setEditMode(isEditMode);
-        playListViewHolder.cb_check.setChecked(isItemChecked(position));
+        final LocalAudioListViewHolder localAudioListViewHolder = (LocalAudioListViewHolder) holder;
+        localAudioListViewHolder.tv_song_name.setText(mAudioInfos.get(position).getSongName());
+        localAudioListViewHolder.tv_singer_name.setText(mAudioInfos.get(position).getSingerName());
+        localAudioListViewHolder.tv_duration.setText(mAudioInfos.get(position).getDurationText());
+        localAudioListViewHolder.tv_index.setText(String.valueOf(position));
+        localAudioListViewHolder.setEditMode(isEditMode);
+        localAudioListViewHolder.cb_check.setChecked(isItemChecked(position));
 
-        playListViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        localAudioListViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isEditMode) {
@@ -101,11 +100,6 @@ public class PlayListAdapter extends RecyclerView.Adapter {
             }
         });
 
-        if (position == PlayList.getInstance().getCurrentIndex()) {
-            playListViewHolder.itemView.setBackgroundResource(R.drawable.background_play_list_playing_item);
-        } else {
-            playListViewHolder.itemView.setBackgroundResource(R.drawable.background_play_list_item);
-        }
     }
 
     @Override
@@ -113,14 +107,14 @@ public class PlayListAdapter extends RecyclerView.Adapter {
         return mAudioInfos.size();
     }
 
-    private class PlayListViewHolder extends RecyclerView.ViewHolder {
+    private class LocalAudioListViewHolder extends RecyclerView.ViewHolder {
         public TextView tv_song_name, tv_singer_name, tv_duration, tv_index;
         public AudioInfo audioInfo;
         public int audioIndex;
         public View itemView;
         public CheckBox cb_check;
 
-        public PlayListViewHolder(View itemView) {
+        public LocalAudioListViewHolder(View itemView) {
             super(itemView);
             this.itemView = itemView;
             tv_song_name = itemView.findViewById(R.id.tv_song_name);
@@ -144,19 +138,6 @@ public class PlayListAdapter extends RecyclerView.Adapter {
     }
 
 
-    public void refreshItem() {
-        Log.e(TAG, "refreshItem: " + mCurrentIndex);
-        if (mCurrentIndex != -1) {
-            notifyItemChanged(mCurrentIndex);
-        }
-
-        mCurrentIndex = PlayList.getInstance().getCurrentIndex();
-        Log.e(TAG, "refreshItem a: " + mCurrentIndex);
-        if (mCurrentIndex != -1) {
-            notifyItemChanged(mCurrentIndex);
-        }
-    }
-
     public ArrayList<AudioInfo> getSelectedItem() {
         ArrayList<AudioInfo> selectList = new ArrayList<>();
         for (int i = 0; i < mAudioInfos.size(); i++) {
@@ -179,11 +160,11 @@ public class PlayListAdapter extends RecyclerView.Adapter {
         this.mSelectListener = selectListener;
     }
 
-    public void setOnClickListener(PlayListItemOnClickListener listener) {
+    public void setOnClickListener(LocalListItemOnClickListener listener) {
         this.mListener = listener;
     }
 
-    public interface PlayListItemOnClickListener {
+    public interface LocalListItemOnClickListener {
         void onItemClick(int index);
     }
 

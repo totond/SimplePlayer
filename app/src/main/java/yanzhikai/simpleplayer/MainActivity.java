@@ -2,7 +2,6 @@ package yanzhikai.simpleplayer;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
-import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -28,12 +27,14 @@ import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.AudioListInfo;
 import yanzhikai.simpleplayer.service.AudioPlayerService;
+import yanzhikai.simpleplayer.ui.LocalAudioListFragment;
 import yanzhikai.simpleplayer.ui.PlayListFragment;
-import yanzhikai.simpleplayer.ui.ScanActivity;
+import yanzhikai.simpleplayer.utils.ScreenUtils;
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener{
     public static final String TAG = "yjkMainActivity";
     private static final String PLAY_LIST_FRAGMENT_TAG = "PlayListFragment";
+    private static final String LOCAL_AUDIO_LIST_FRAGMENT_TAG = "LocalAudioListFragment";
     private static final String PLAY_LIST_FRAGMENT_NAME = "PlayList";
     private ImageView btn_pre, btn_play_pause, btn_next;
     private Button btn_choose;
@@ -42,6 +43,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //    private RecyclerView rv_play_list;
 //    private PlayListAdapter mPlayListAdapter;
     private LinearLayout ly_play_list;
+    private RelativeLayout ly_sub_list;
+    private int screenWidth, screenHeight, playListWidth, subListWidth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         EventBus.getDefault().register(this);
         initView();
+        initScreen();
         loadPlayListFragment();
 
     }
@@ -69,6 +73,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         btn_choose = findViewById(R.id.btn_choose);
         sb_progress = findViewById(R.id.sb_progress);
         ly_play_list = findViewById(R.id.ly_play_list);
+        ly_sub_list = findViewById(R.id.ly_sub_list);
 
         btn_pre.setOnClickListener(this);
         btn_play_pause.setOnClickListener(this);
@@ -87,13 +92,27 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //        testAudioList();
     }
 
-    private void smaller(){
+    private void initScreen(){
+        screenWidth = ScreenUtils.getScreenWidth(this);
+        screenHeight = ScreenUtils.getScreenHeight(this);
+        //要求ly_play_list和ly_sub_list的宽度是具体值
+        playListWidth = ly_play_list.getLayoutParams().width;
+        subListWidth = ly_sub_list.getLayoutParams().width;
+        Log.d(TAG, "playListWidth: " + playListWidth);
+        Log.d(TAG, "screenWidth: " + screenWidth);
+    }
+
+    private void smaller() {
+        Log.d(TAG, "playListWidth: " + playListWidth);
+        Log.d(TAG, "screenWidth: " + screenWidth);
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) ly_play_list.getLayoutParams();
         ValueAnimator valueAnimator;
-        if (layoutParams.width > 800) {
-            valueAnimator = ValueAnimator.ofInt(1280, 600);
-        }else {
-            valueAnimator = ValueAnimator.ofInt(600, 1280);
+        if (layoutParams.width > screenWidth / 2) {
+            valueAnimator = ValueAnimator.ofInt(playListWidth, screenWidth / 2);
+            loadLocalAudioListFragment();
+        } else {
+            valueAnimator = ValueAnimator.ofInt(screenWidth / 2, playListWidth);
+            removeLocalAudioListFragment();
         }
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -101,6 +120,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) ly_play_list.getLayoutParams();
                 layoutParams.width = (int) animation.getAnimatedValue();
                 ly_play_list.setLayoutParams(layoutParams);
+
+                RelativeLayout.LayoutParams subLayoutParams = (RelativeLayout.LayoutParams) ly_sub_list.getLayoutParams();
+                subLayoutParams.width = screenWidth - (int) animation.getAnimatedValue();
+                ly_sub_list.setLayoutParams(subLayoutParams);
 
             }
         });
@@ -125,7 +148,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
             }
         });
-        valueAnimator.setDuration(1000);
+        valueAnimator.setDuration(500);
         valueAnimator.start();
     }
 
@@ -135,7 +158,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     }
 
 //    @Subscribe(threadMode = ThreadMode.MAIN)
-//    public void handleAudioChanged(AudioChangedEvent changedEvent){
+//    public void handleAudioChanged(AudioChangedEventPlay changedEvent){
 //        mPlayListAdapter.refreshItem();
 //        rv_play_list.smoothScrollToPosition(PlayList.getInstance().getCurrentIndex());
 //    }
@@ -204,8 +227,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             case R.id.btn_choose:
 //                mAudioPlayer.setPath("/storage/emulated/0/Music/陈奕迅 - 陀飞轮.mp3");
 //                mAudioPlayer.prepareAsync();
-                startActivity(new Intent(this, ScanActivity.class));
-//                smaller();
+//                startActivity(new Intent(this, ScanActivity.class));
+                smaller();
 
                 break;
         }
@@ -261,6 +284,30 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             audioEvent.setProgress(sb_progress.getProgress() / 1000f);
             EventBus.getDefault().post(audioEvent);
 //            canUpdate = true;
+        }
+    }
+
+    public void loadLocalAudioListFragment() {
+        Fragment newFragment = getSupportFragmentManager().findFragmentByTag(LOCAL_AUDIO_LIST_FRAGMENT_TAG);
+        if (newFragment == null) {
+            Fragment fragment = new LocalAudioListFragment();
+            FragmentTransaction transaction = getSupportFragmentManager()
+                    .beginTransaction()
+                    .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                    .replace(R.id.ly_sub_list, fragment, LOCAL_AUDIO_LIST_FRAGMENT_TAG);
+//            transaction.addToBackStack(PLAY_LIST_FRAGMENT_NAME);
+            transaction.commit();
+        } else {
+            getSupportFragmentManager().popBackStack(LOCAL_AUDIO_LIST_FRAGMENT_TAG, 0);
+        }
+    }
+
+    public void removeLocalAudioListFragment() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(LOCAL_AUDIO_LIST_FRAGMENT_TAG);
+        if (fragment != null){
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.remove(fragment);
+            fragmentTransaction.commit();
         }
     }
 

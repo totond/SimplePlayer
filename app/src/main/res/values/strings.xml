@@ -7,7 +7,13 @@
     <string name="play_list_edit">编辑</string>
     <string name="play_list_edit_completed">保存</string>
     <string name="play_list_delete">删除</string>
+    <string name="play_list_choose_all">全选</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="local_list_title">本地音乐列表</string>
+    <string name="local_list_search">搜索本地音乐</string>
+    <string name="local_list_edit">编辑</string>
+    <string name="local_list_edit_completed">完成</string>
+    <string name="local_list_delete">删除</string>
+    <string name="local_list_add">加入到左边</string>
+    <string name="local_list_choose_all">全选</string>
 </resources>

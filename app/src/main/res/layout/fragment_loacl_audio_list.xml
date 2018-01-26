@@ -1,13 +1,89 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="yanzhikai.simpleplayer.ui.LoaclAudioListFragment">
+    android:orientation="vertical"
+    tools:context="yanzhikai.simpleplayer.ui.LocalAudioListFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@drawable/background_play_list_bar">
+
+        <TextView
+            android:id="@+id/tv_playlist_title"
+            style="@style/AudioListTitleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_margin="40dp"
+            android:text="@string/local_list_title" />
+
+        <TextView
+            android:id="@+id/tv_add"
+            style="@style/AudioListEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:layout_toStartOf="@+id/tv_delete"
+            android:background="@drawable/background_btn"
+            android:text="@string/local_list_add" />
+
+        <TextView
+            android:id="@+id/tv_delete"
+            style="@style/AudioListEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:layout_toStartOf="@+id/tv_choose_all"
+            android:background="@drawable/background_btn"
+            android:text="@string/local_list_delete"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/tv_choose_all"
+            style="@style/AudioListEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:layout_toStartOf="@+id/tv_edit"
+            android:background="@drawable/background_btn"
+            android:text="@string/local_list_choose_all"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/tv_search"
+            style="@style/AudioListEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:layout_toStartOf="@+id/tv_edit"
+            android:background="@drawable/background_btn"
+            android:text="@string/local_list_search" />
+
+        <TextView
+            android:id="@+id/tv_edit"
+            style="@style/AudioListEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/background_btn"
+            android:text="@string/local_list_edit" />
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_local_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:scrollbars="vertical"
+        android:translationZ="5dp">
+    </android.support.v7.widget.RecyclerView>
 
-</FrameLayout>
+
+</LinearLayout>
