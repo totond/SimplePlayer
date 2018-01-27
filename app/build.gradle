@@ -46,4 +46,9 @@ dependencies {
     compile 'com.android.support:percent:25.3.0'
 
     compile 'org.greenrobot:greendao:3.2.2'
+    compile("com.github.hotchemi:permissionsdispatcher:3.1.0") {
+        // if you don't use android.app.Fragment you can exclude support for them
+        exclude module: "support-v13"
+    }
+    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.0.1'
 }

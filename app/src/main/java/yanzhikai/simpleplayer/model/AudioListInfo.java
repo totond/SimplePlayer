@@ -61,6 +61,10 @@ public class AudioListInfo {
         this.listName = listName;
     }
 
+    public List<AudioInfo> getRefreshList(){
+        resetInfoList();
+        return getInfoList();
+    }
     /**
      * To-many relationship, resolved on first access (and after reset).
      * Changes to to-many relations are not persisted, make changes to the target entity.

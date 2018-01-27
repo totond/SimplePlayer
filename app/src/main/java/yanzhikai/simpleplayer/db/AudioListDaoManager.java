@@ -50,6 +50,7 @@ public class AudioListDaoManager {
         initLocalAudioList();
     }
 
+
     public DaoMaster getDaoMaster() {
         if (sDaoMaster == null) {
             DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(mContext, DB_NAME, null);
@@ -58,6 +59,7 @@ public class AudioListDaoManager {
         return sDaoMaster;
     }
 
+    //后面使用的时候要用这个方法，不能直接调用本体，因为有可能已经会被关掉
     public DaoSession getDaoSession() {
         if (sDaoSession == null) {
             if (sDaoMaster == null) {
@@ -75,8 +77,8 @@ public class AudioListDaoManager {
             insertList(audioListInfo);
             Log.d(TAG, "initLocalAudioList: create");
         }
-        Log.d(TAG, "initLocalAudioList: size: " + queryAudioByQueryBuilder(LOCAL_LIST_NAME).size());
-        mLocalListInfo = queryAudioByQueryBuilder(LOCAL_LIST_NAME).get(0);
+        Log.d(TAG, "initLocalAudioList: size: " + queryAudioListByName(LOCAL_LIST_NAME).getInfoList().size());
+        mLocalListInfo = queryAudioListByName(LOCAL_LIST_NAME);
         Log.d(TAG, "initLocalAudioList: get:" + mLocalListInfo.getInfoList().size());
     }
 
@@ -203,22 +205,6 @@ public class AudioListDaoManager {
         return flag;
     }
 
-    /**
-     * 删除所有记录
-     *
-     * @return
-     */
-    public boolean deleteAll() {
-        boolean flag = false;
-        try {
-            //按照id删除
-            getDaoSession().deleteAll(AudioListInfo.class);
-            flag = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return flag;
-    }
 
     /**
      * 查询所有记录
@@ -232,26 +218,20 @@ public class AudioListDaoManager {
     /**
      * 根据主键id查询记录
      *
-     * @param key
+     * @param name
      * @return
      */
-    public AudioListInfo queryAudioById(long key) {
-        return getDaoSession().load(AudioListInfo.class, key);
+    public AudioListInfo queryAudioListByName(String name) {
+        return getDaoSession().load(AudioListInfo.class, name);
     }
 
-    /**
-     * 使用native sql进行查询操作
-     */
-    public List<AudioListInfo> queryAudioByNativeSql(String sql, String[] conditions) {
-        return getDaoSession().queryRaw(AudioListInfo.class, sql, conditions);
-    }
 
     /**
      * 使用queryBuilder进行查询
      *
      * @return
      */
-    public List<AudioListInfo> queryAudioByQueryBuilder(String name) {
+    public List<AudioListInfo> queryAudioListByQueryBuilder(String name) {
         QueryBuilder<AudioListInfo> queryBuilder = getDaoSession().queryBuilder(AudioListInfo.class);
         return queryBuilder.where(AudioListInfoDao.Properties.ListName.eq(name)).list();
     }
@@ -275,7 +255,7 @@ public class AudioListDaoManager {
         }
     }
 
-    public void insertAudioToList(AudioInfo audioInfo, AudioListInfo audioListInfo) {
+    public boolean insertAudioToList(AudioInfo audioInfo, AudioListInfo audioListInfo) {
         String joinMd5 = MD5Util.encryptMD5ToString(audioInfo.getAudioHash() + audioListInfo.getListName());
         QueryBuilder<AudioInfo> queryBuilder = getDaoSession().queryBuilder(AudioInfo.class);
         List<AudioInfo> audioInfos = queryBuilder.where(AudioInfoDao.Properties.AudioHash.eq(audioInfo.getAudioHash())).list();
@@ -284,18 +264,39 @@ public class AudioListDaoManager {
             insertAudio(audioInfo);
         }
 
-        QueryBuilder<JoinListWithAudio> joinQueryBuilder = getDaoSession().queryBuilder(JoinListWithAudio.class);
-        List<JoinListWithAudio> joinListWithAudios = joinQueryBuilder.where(JoinListWithAudioDao.Properties.JoinMD5.eq(joinMd5)).list();
-        if (joinListWithAudios.size() <= 0) {
+//        QueryBuilder<JoinListWithAudio> joinQueryBuilder = getDaoSession().queryBuilder(JoinListWithAudio.class);
+//        List<JoinListWithAudio> joinListWithAudios = joinQueryBuilder.where(JoinListWithAudioDao.Properties.JoinMD5.eq(joinMd5)).list();
+        JoinListWithAudio joinListWithAudio = queryJoin(joinMd5);
+        if (joinListWithAudio == null) {
             JoinListWithAudio join = new JoinListWithAudio(
                     joinMd5
                     , audioListInfo.getListName()
                     , audioInfo.getAudioHash()
             );
             insertJoin(join);
+            return true;
         }else {
             Log.d(TAG, "insertAudioToList: 已存在关系");
+            return false;
         }
+    }
+
+    public JoinListWithAudio queryJoin(String md5){
+        return getDaoSession().getJoinListWithAudioDao().load(md5);
+    }
+
+    public void deleteAudioInList(AudioInfo audioInfo, String listName){
+        String  md5 = MD5Util.encryptMD5ToString(audioInfo.getAudioHash() + listName);
+        JoinListWithAudio joinListWithAudio = queryJoin(md5);
+        if (joinListWithAudio != null) {
+            getDaoSession().getJoinListWithAudioDao().delete(joinListWithAudio);
+        }else {
+            Log.w(TAG, "deleteAudioInList: failed, can not found!" );
+        }
+    }
+
+    public void deleteAudioInLocalList(AudioInfo audioInfo){
+        deleteAudioInList(audioInfo,LOCAL_LIST_NAME);
     }
 
     /*
@@ -304,7 +305,7 @@ public class AudioListDaoManager {
 
     public AudioListInfo getLocalListInfo() {
         return mLocalListInfo;
-//        return queryAudioByQueryBuilder(LOCAL_LIST_NAME).get(0);
+//        return queryAudioListByQueryBuilder(LOCAL_LIST_NAME).get(0);
     }
 
     public void insertLocalAudio(AudioInfo... audioInfo) {

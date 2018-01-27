@@ -110,15 +110,16 @@ public class PlayListFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 mPlayListAdapter.selectAllItems();
+                mPlayListAdapter.notifyDataSetChanged();
             }
         });
-        handleAudioChanged();
+        handleCurrentAudioChanged();
         return rootView;
     }
 
 
 
-    private void handleAudioChanged(){
+    private void handleCurrentAudioChanged(){
         mPlayListAdapter.refreshItem();
         int index = PlayList.getInstance().getCurrentIndex();
         if (index >= 0) {
@@ -131,7 +132,7 @@ public class PlayListFragment extends Fragment {
     public void handleListChanged(PlayListChangedEvent playListChangedEvent){
         switch (playListChangedEvent.getType()){
             case PlayListChangedEvent.CURRENT_AUDIO_CHANGED:
-                handleAudioChanged();
+                handleCurrentAudioChanged();
                 break;
             case PlayListChangedEvent.ITEM_ADDED:
                 mPlayListAdapter.notifyDataSetChanged();

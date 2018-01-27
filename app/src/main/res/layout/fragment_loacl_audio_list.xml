@@ -65,6 +65,17 @@
             android:background="@drawable/background_btn"
             android:text="@string/local_list_search" />
 
+        <ProgressBar
+            android:id="@+id/pb_search"
+            style="@style/AudioListEditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:visibility="invisible"
+            />
+
         <TextView
             android:id="@+id/tv_edit"
             style="@style/AudioListEditText"

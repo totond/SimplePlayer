@@ -80,7 +80,7 @@ public class MediaUtil {
      * @param path
      * @param foreachListener
      */
-    private static void scanLocalAudioFile(String path, ForeachListener foreachListener) {
+    public static void scanLocalAudioFile(String path, ForeachListener foreachListener) {
         File[] files = new File(path).listFiles();
         if (files != null && files.length > 0) {
             for (int i = 0; i < files.length; i++) {

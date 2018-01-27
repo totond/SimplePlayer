@@ -56,8 +56,9 @@ public class PlayListAdapter extends RecyclerView.Adapter {
 
     //全选
     public void selectAllItems(){
+        setItemChecked(getItemCount() - 1, mSelectedPositions.get(getItemCount() - 1));
         for (int i = 0; i < mSelectedPositions.size(); i++){
-            mSelectedPositions.put(i, true);
+            setItemChecked(i,true);
         }
     }
 
@@ -84,7 +85,6 @@ public class PlayListAdapter extends RecyclerView.Adapter {
                 if (isEditMode) {
 
                     if (isItemChecked(position)) {
-
                         setItemChecked(position, false);
                     } else {
                         setItemChecked(position, true);

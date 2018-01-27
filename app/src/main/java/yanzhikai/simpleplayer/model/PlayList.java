@@ -47,11 +47,12 @@ public class PlayList {
         return instance;
     }
 
-    public void add(AudioInfo info) {
-        if (!isExist(info)) {
+    public boolean add(AudioInfo info) {
+        if (PlayListAudioDaoManager.getInstance().insertAudio(info)) {
             mAudioList.add(info);
-            PlayListAudioDaoManager.getInstance().insertAudio(info);
+            return true;
         }
+        return false;
     }
 
 //    public void add(int index, AudioInfo... infos){
@@ -60,13 +61,21 @@ public class PlayList {
 //        }
 //    }
 
-    public void add(List<AudioInfo> infos) {
+    public boolean add(List<AudioInfo> infos) {
+        boolean flag = true;
         for (AudioInfo info : infos) {
-            if (!isExist(info)) {
-                mAudioList.add(info);
-                PlayListAudioDaoManager.getInstance().insertAudio(info);
-            }
+//            if (!isExist(info)) {
+                if (PlayListAudioDaoManager.getInstance().insertAudio(info)) {
+                    mAudioList.add(info);
+                    Log.d(TAG, "add: not exist");
+                    flag &= true;
+                }else {
+                    flag &= false;
+                }
+//            }
         }
+
+        return flag;
 
     }
 
@@ -157,6 +166,12 @@ public class PlayList {
     }
 
     public int getCurrentIndex() {
+        if (mCurrentAudio == null){
+            mCurrentIndex = -1;
+        }else {
+            mCurrentIndex = mAudioList.indexOf(mCurrentAudio);
+        }
+
         return mCurrentIndex;
     }
 

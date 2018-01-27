@@ -243,14 +243,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //        AudioListDaoManager.getInstance().insertList(audioListInfo);
 
         //修改
-//        AudioListInfo audioListInfo1 = AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").get(0);
+//        AudioListInfo audioListInfo1 = AudioListDaoManager.getInstance().queryAudioListByQueryBuilder("TestList1").get(0);
 //        audioListInfo1.getInfoList().addAll(LocalAudioDaoManager.getInstance().queryAllAudio());
 //        Log.d(TAG, "testAudioList: pre size:" + audioListInfo1.getInfoList().size());
 //        audioListInfo1.update();
 
         //查询
-        List<AudioInfo> audioInfos = AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").get(0).getInfoList();
-        Log.d(TAG, "testAudioList:size " + AudioListDaoManager.getInstance().queryAudioByQueryBuilder("TestList1").size());
+        List<AudioInfo> audioInfos = AudioListDaoManager.getInstance().queryAudioListByQueryBuilder("TestList1").get(0).getInfoList();
+        Log.d(TAG, "testAudioList:size " + AudioListDaoManager.getInstance().queryAudioListByQueryBuilder("TestList1").size());
         Log.d(TAG, "testAudioList:result " + audioInfos.size());
 //        ToastUtil.makeShortToast(this,audioInfos.get(0).getSongName());
 

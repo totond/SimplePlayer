@@ -41,6 +41,7 @@ public class LocalAudioListAdapter extends RecyclerView.Adapter {
     }
 
     private void setItemChecked(int position, boolean isChecked) {
+//        Log.d(TAG, "setItemChecked: " + position + " state: " + isChecked);
         mSelectedPositions.put(position, isChecked);
     }
 
@@ -55,8 +56,11 @@ public class LocalAudioListAdapter extends RecyclerView.Adapter {
 
     //全选
     public void selectAllItems(){
+        //让数组启动初始化
+        setItemChecked(getItemCount() - 1, mSelectedPositions.get(getItemCount() - 1));
+
         for (int i = 0; i < mSelectedPositions.size(); i++){
-            mSelectedPositions.put(i, true);
+            setItemChecked(i,true);
         }
     }
 
@@ -75,15 +79,14 @@ public class LocalAudioListAdapter extends RecyclerView.Adapter {
         localAudioListViewHolder.tv_duration.setText(mAudioInfos.get(position).getDurationText());
         localAudioListViewHolder.tv_index.setText(String.valueOf(position));
         localAudioListViewHolder.setEditMode(isEditMode);
+
         localAudioListViewHolder.cb_check.setChecked(isItemChecked(position));
 
         localAudioListViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isEditMode) {
-
                     if (isItemChecked(position)) {
-
                         setItemChecked(position, false);
                     } else {
                         setItemChecked(position, true);
@@ -122,7 +125,6 @@ public class LocalAudioListAdapter extends RecyclerView.Adapter {
             tv_duration = itemView.findViewById(R.id.tv_duration);
             tv_index = itemView.findViewById(R.id.tv_index);
             cb_check = itemView.findViewById(R.id.cb_check);
-
         }
 
         public void setEditMode(boolean editMode) {
@@ -154,6 +156,10 @@ public class LocalAudioListAdapter extends RecyclerView.Adapter {
 
     public boolean getEditMode(){
         return isEditMode;
+    }
+
+    public void setAudioInfos(List<AudioInfo> audioInfos) {
+        this.mAudioInfos = audioInfos;
     }
 
     public void setSelectListener(ListOnSelectListener selectListener) {
