@@ -10,6 +10,7 @@ package yanzhikai.simpleplayer.event;
 public class LocalListChangedEvent {
     public static final int SEARCH_FINISH = 0;
     public static final int AUDIO_ADDED = 1;
+    public static final int ANIMATION_FINISH = 2;
 
     private int mType = SEARCH_FINISH;
 

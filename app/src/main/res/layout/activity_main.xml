@@ -55,41 +55,7 @@
             android:text="choose" />
     </RelativeLayout>
 
-    <!--<LinearLayout-->
-        <!--android:id="@+id/ly_bottom"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignParentBottom="true"-->
-        <!--android:orientation="horizontal">-->
 
-        <!--<Button-->
-            <!--android:id="@+id/btn_pre"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:text="PRE" />-->
-
-        <!--<Button-->
-            <!--android:id="@+id/btn_pause"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:text="START" />-->
-
-        <!--<Button-->
-            <!--android:id="@+id/btn_next"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:text="NEXT" />-->
-
-        <!--<Button-->
-            <!--android:id="@+id/btn_choose"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_weight="1"-->
-            <!--android:text="choose" />-->
-    <!--</LinearLayout>-->
 
     <SeekBar
         android:id="@+id/sb_progress"
@@ -119,5 +85,75 @@
         android:layout_marginBottom="10dp"
         >
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ly_local_btn"
+            android:orientation="vertical"
+            android:layout_margin="20dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/background_btn"
+            >
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@mipmap/local_audios"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_local_list"
+                android:layout_gravity="center_horizontal"
+                style="@style/MainButtonText"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ly_audios_btn"
+            android:layout_below="@+id/ly_local_btn"
+            android:layout_margin="20dp"
+            android:orientation="vertical"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/background_btn"
+            >
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@mipmap/audio_lists"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_audio_list"
+                android:layout_gravity="center_horizontal"
+                style="@style/MainButtonText"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ly_timer_btn"
+            android:layout_below="@+id/ly_audios_btn"
+            android:orientation="vertical"
+            android:layout_margin="20dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/background_btn"
+            >
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@mipmap/timer"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_timer"
+                android:layout_gravity="center_horizontal"
+                style="@style/MainButtonText"
+                />
+        </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

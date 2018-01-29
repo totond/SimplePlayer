@@ -15,7 +15,6 @@ import java.util.List;
 
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.model.AudioInfo;
-import yanzhikai.simpleplayer.model.PlayList;
 
 /**
  * author : yany
@@ -28,8 +27,7 @@ public class LocalAudioListAdapter extends RecyclerView.Adapter {
     public static final String TAG = "yjkAdapter";
     private Context mContext;
     private List<AudioInfo> mAudioInfos;
-    private LocalListItemOnClickListener mListener;
-    private int mCurrentIndex = -1;
+    private BaseOnItemClickListener mListener;
 
     private boolean isEditMode = false;
     private SparseBooleanArray mSelectedPositions = new SparseBooleanArray();
@@ -66,8 +64,7 @@ public class LocalAudioListAdapter extends RecyclerView.Adapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.d(TAG, "onCreateViewHolder: ");
-        View view = LayoutInflater.from(mContext).inflate(R.layout.play_list_item, null, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.audio_list_item, null, false);
         return new LocalAudioListViewHolder(view);
     }
 
@@ -113,7 +110,6 @@ public class LocalAudioListAdapter extends RecyclerView.Adapter {
     private class LocalAudioListViewHolder extends RecyclerView.ViewHolder {
         public TextView tv_song_name, tv_singer_name, tv_duration, tv_index;
         public AudioInfo audioInfo;
-        public int audioIndex;
         public View itemView;
         public CheckBox cb_check;
 
@@ -166,12 +162,8 @@ public class LocalAudioListAdapter extends RecyclerView.Adapter {
         this.mSelectListener = selectListener;
     }
 
-    public void setOnClickListener(LocalListItemOnClickListener listener) {
+    public void setOnClickListener(BaseOnItemClickListener listener) {
         this.mListener = listener;
-    }
-
-    public interface LocalListItemOnClickListener {
-        void onItemClick(int index);
     }
 
     public interface ListOnSelectListener {

@@ -189,15 +189,11 @@ public class AudioListDaoManager {
 
     /**
      * 删除单条记录
-     *
-     * @param listInfo
-     * @return
      */
-    public boolean deleteAudio(AudioListInfo listInfo) {
+    public boolean deleteAudioList(AudioListInfo listInfo) {
         boolean flag = false;
         try {
-            //按照id删除
-            getDaoSession().delete(listInfo);
+            getDaoSession().getAudioListInfoDao().delete(listInfo);
             flag = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -205,6 +201,21 @@ public class AudioListDaoManager {
         return flag;
     }
 
+    /**
+     * 删除多条记录
+     */
+    public boolean deleteAudioList(List<AudioListInfo> listInfos) {
+        boolean flag = false;
+        try {
+            for (AudioListInfo listInfo : listInfos) {
+                getDaoSession().getAudioListInfoDao().delete(listInfo);
+            }
+            flag = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return flag;
+    }
 
     /**
      * 查询所有记录
@@ -308,6 +319,12 @@ public class AudioListDaoManager {
 //        return queryAudioListByQueryBuilder(LOCAL_LIST_NAME).get(0);
     }
 
+    public List<AudioListInfo> getRefreshListInfos(){
+        List<AudioListInfo> listInfos = queryAllList();
+        listInfos.remove(getLocalListInfo());
+        return listInfos;
+    }
+
     public void insertLocalAudio(AudioInfo... audioInfo) {
         try {
             AudioListInfo audioListInfo = getLocalListInfo();
@@ -352,23 +369,6 @@ public class AudioListDaoManager {
         return flag;
     }
 
-    /**
-     * 删除单条记录
-     *
-     * @param meizi
-     * @return
-     */
-    public boolean deleteAudio(AudioInfo meizi) {
-        boolean flag = false;
-        try {
-            //按照id删除
-            getDaoSession().delete(meizi);
-            flag = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return flag;
-    }
 
     /**
      * 删除所有记录

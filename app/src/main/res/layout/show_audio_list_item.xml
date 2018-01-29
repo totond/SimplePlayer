@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/background_play_list_item"
+    >
+
+    <TextView
+        android:id="@+id/tv_list_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/audio_list_show_padding"
+        android:layout_marginTop="8dp"
+        android:textSize="20sp"
+        android:textColor="@color/colorBlack"
+        android:text="未知"
+        />
+
+    <TextView
+        android:id="@+id/tv_list_size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="4dp"
+        android:textColor="@color/colorSlateGrey"
+        android:textSize="18sp"
+        android:layout_alignStart="@+id/tv_list_name"
+        android:text="未知数量"
+        android:layout_below="@+id/tv_list_name"/>
+
+    <CheckBox
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/cb_check"
+        android:visibility="invisible"
+        android:layout_marginEnd="@dimen/audio_list_show_padding"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        />
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:id="@+id/iv_enter"
+        android:src="@mipmap/right"
+        android:scaleType="fitXY"
+        android:layout_marginEnd="@dimen/audio_list_show_padding"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        />
+
+</RelativeLayout>

@@ -8,38 +8,39 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.model.AudioInfo;
-import yanzhikai.simpleplayer.model.PlayList;
+import yanzhikai.simpleplayer.model.AudioListInfo;
 
 /**
  * author : yany
  * e-mail : yanzhikai_yjk@qq.com
- * time   : 2018/01/12
+ * time   : 2018/01/29
  * desc   :
  */
 
-public class PlayListAdapter extends RecyclerView.Adapter {
+public class ShowListAdapter extends RecyclerView.Adapter{
     public static final String TAG = "yjkAdapter";
     private Context mContext;
-    private ArrayList<AudioInfo> mAudioInfos;
+    private List<AudioListInfo> mAudioListInfos;
     private BaseOnItemClickListener mListener;
-    private int mCurrentIndex = -1;
 
     private boolean isEditMode = false;
     private SparseBooleanArray mSelectedPositions = new SparseBooleanArray();
-    private ListOnSelectListener mSelectListener;
 
-    public PlayListAdapter(Context context, ArrayList<AudioInfo> audioInfos) {
+    public ShowListAdapter(Context context, List<AudioListInfo> audioInfos) {
         mContext = context;
-        mAudioInfos = audioInfos;
+        mAudioListInfos = audioInfos;
     }
 
     private void setItemChecked(int position, boolean isChecked) {
+//        Log.d(TAG, "setItemChecked: " + position + " state: " + isChecked);
         mSelectedPositions.put(position, isChecked);
     }
 
@@ -54,7 +55,9 @@ public class PlayListAdapter extends RecyclerView.Adapter {
 
     //全选
     public void selectAllItems(){
+        //让数组启动初始化
         setItemChecked(getItemCount() - 1, mSelectedPositions.get(getItemCount() - 1));
+
         for (int i = 0; i < mSelectedPositions.size(); i++){
             setItemChecked(i,true);
         }
@@ -63,32 +66,27 @@ public class PlayListAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.d(TAG, "onCreateViewHolder: ");
-        View view = LayoutInflater.from(mContext).inflate(R.layout.audio_list_item, null, false);
-        return new PlayListViewHolder(view);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.show_audio_list_item, null, false);
+        return new ShowAudioListViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        final PlayListViewHolder playListViewHolder = (PlayListViewHolder) holder;
-        playListViewHolder.tv_song_name.setText(mAudioInfos.get(position).getSongName());
-        playListViewHolder.tv_singer_name.setText(mAudioInfos.get(position).getSingerName());
-        playListViewHolder.tv_duration.setText(mAudioInfos.get(position).getDurationText());
-        playListViewHolder.tv_index.setText(String.valueOf(position));
-        playListViewHolder.setEditMode(isEditMode);
-        playListViewHolder.cb_check.setChecked(isItemChecked(position));
+        final ShowAudioListViewHolder showAudioListViewHolder = (ShowAudioListViewHolder) holder;
+        showAudioListViewHolder.tv_list_name.setText(mAudioListInfos.get(position).getListName());
+        showAudioListViewHolder.tv_list_size.setText(mAudioListInfos.get(position).getInfoList().size() + "首");
+        showAudioListViewHolder.setEditMode(isEditMode);
 
-        playListViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        showAudioListViewHolder.cb_check.setChecked(isItemChecked(position));
+
+        showAudioListViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isEditMode) {
-
                     if (isItemChecked(position)) {
                         setItemChecked(position, false);
                     } else {
                         setItemChecked(position, true);
-                    }
-                    if (mSelectListener != null) {
-                        mSelectListener.onItemSelected(position);
                     }
                     notifyItemChanged(position);
                 } else {
@@ -99,69 +97,47 @@ public class PlayListAdapter extends RecyclerView.Adapter {
             }
         });
 
-        if (position == PlayList.getInstance().getCurrentIndex()) {
-            playListViewHolder.itemView.setBackgroundResource(R.drawable.background_play_list_playing_item);
-        } else {
-            playListViewHolder.itemView.setBackgroundResource(R.drawable.background_play_list_item);
-        }
     }
 
     @Override
     public int getItemCount() {
-        return mAudioInfos.size();
+        return mAudioListInfos.size();
     }
 
-    private class PlayListViewHolder extends RecyclerView.ViewHolder {
-        public TextView tv_song_name, tv_singer_name, tv_duration, tv_index;
+    private class ShowAudioListViewHolder extends RecyclerView.ViewHolder {
+        public TextView tv_list_name, tv_list_size;
         public AudioInfo audioInfo;
-        public int audioIndex;
         public View itemView;
         public CheckBox cb_check;
+        public ImageView iv_enter;
 
-        public PlayListViewHolder(View itemView) {
+        public ShowAudioListViewHolder(View itemView) {
             super(itemView);
             this.itemView = itemView;
-            tv_song_name = itemView.findViewById(R.id.tv_song_name);
-            tv_singer_name = itemView.findViewById(R.id.tv_singer_name);
-            tv_duration = itemView.findViewById(R.id.tv_duration);
-            tv_index = itemView.findViewById(R.id.tv_index);
+            tv_list_name = itemView.findViewById(R.id.tv_list_name);
+            tv_list_size = itemView.findViewById(R.id.tv_list_size);
             cb_check = itemView.findViewById(R.id.cb_check);
-
+            iv_enter = itemView.findViewById(R.id.iv_enter);
         }
 
         public void setEditMode(boolean editMode) {
             if (editMode) {
                 cb_check.setVisibility(View.VISIBLE);
-                tv_index.setVisibility(View.INVISIBLE);
+                iv_enter.setVisibility(View.INVISIBLE);
             } else {
                 cb_check.setVisibility(View.GONE);
-                tv_index.setVisibility(View.VISIBLE);
+                iv_enter.setVisibility(View.VISIBLE);
             }
         }
 
     }
 
 
-    //刷新当前播放Item
-    public void refreshItem() {
-        Log.e(TAG, "refreshItem: " + mCurrentIndex);
-        if (mCurrentIndex != -1) {
-            notifyItemChanged(mCurrentIndex);
-        }
-
-        mCurrentIndex = PlayList.getInstance().getCurrentIndex();
-        Log.e(TAG, "refreshItem a: " + mCurrentIndex);
-        if (mCurrentIndex != -1) {
-            notifyItemChanged(mCurrentIndex);
-        }
-    }
-
-    //获取选中Item信息
-    public ArrayList<AudioInfo> getSelectedItem() {
-        ArrayList<AudioInfo> selectList = new ArrayList<>();
-        for (int i = 0; i < mAudioInfos.size(); i++) {
+    public ArrayList<AudioListInfo> getSelectedItem() {
+        ArrayList<AudioListInfo> selectList = new ArrayList<>();
+        for (int i = 0; i < mAudioListInfos.size(); i++) {
             if (isItemChecked(i)) {
-                selectList.add(mAudioInfos.get(i));
+                selectList.add(mAudioListInfos.get(i));
             }
         }
         return selectList;
@@ -175,17 +151,17 @@ public class PlayListAdapter extends RecyclerView.Adapter {
         return isEditMode;
     }
 
-    public void setSelectListener(ListOnSelectListener selectListener) {
-        this.mSelectListener = selectListener;
+    public void setAudioListInfos(List<AudioListInfo> audioListInfos) {
+        this.mAudioListInfos = audioListInfos;
     }
+
 
     public void setOnClickListener(BaseOnItemClickListener listener) {
         this.mListener = listener;
     }
 
-
-
     public interface ListOnSelectListener {
         void onItemSelected(int index);
     }
 }
+

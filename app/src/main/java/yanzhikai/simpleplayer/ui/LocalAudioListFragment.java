@@ -24,9 +24,9 @@ import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.RuntimePermissions;
 import yanzhikai.simpleplayer.R;
+import yanzhikai.simpleplayer.adapter.BaseOnItemClickListener;
 import yanzhikai.simpleplayer.adapter.LocalAudioListAdapter;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;
-import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.event.LocalListChangedEvent;
 import yanzhikai.simpleplayer.event.PlayListChangedEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
@@ -46,7 +46,7 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
 
     private RecyclerView rv_local_list;
     private LocalAudioListAdapter mLocalAudioListAdapter;
-    private TextView tv_edit,tv_delete,tv_add,tv_search,tv_choose_all;
+    private TextView tv_edit, tv_delete, tv_add, tv_search, tv_choose_all;
     private ProgressBar pb_search;
     private boolean mIsSearching = false;
 
@@ -92,8 +92,8 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void handleLocalListChanged(LocalListChangedEvent localListChangedEvent){
-        switch (localListChangedEvent.getType()){
+    public void handleLocalListChanged(LocalListChangedEvent localListChangedEvent) {
+        switch (localListChangedEvent.getType()) {
             case LocalListChangedEvent.SEARCH_FINISH:
                 mIsSearching = false;
                 updateSearching();
@@ -105,18 +105,20 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
                 mLocalAudioListAdapter.notifyDataSetChanged();
                 rv_local_list.smoothScrollToPosition(AudioListDaoManager.getInstance().getLocalListInfo().getInfoList().size() - 1);
                 break;
+            case LocalListChangedEvent.ANIMATION_FINISH:
+                mLocalAudioListAdapter.notifyDataSetChanged();
+                break;
         }
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.tv_edit:
-                if (mLocalAudioListAdapter.getEditMode()){
+                if (mLocalAudioListAdapter.getEditMode()) {
                     updateEditMode(true);
                     mLocalAudioListAdapter.setEditMode(false);
-//                    ToastUtil.makeShortToast(PlayListFragment.this.getContext(),"选择了"+mPlayListAdapter.getSelectedItem().size());
-                }else {
+                } else {
                     updateEditMode(false);
                     mLocalAudioListAdapter.clearSelected();
                     mLocalAudioListAdapter.setEditMode(true);
@@ -124,7 +126,7 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
                 mLocalAudioListAdapter.notifyDataSetChanged();
                 break;
             case R.id.tv_delete:
-                for (AudioInfo audioInfo : mLocalAudioListAdapter.getSelectedItem()){
+                for (AudioInfo audioInfo : mLocalAudioListAdapter.getSelectedItem()) {
                     AudioListDaoManager.getInstance().deleteAudioInLocalList(audioInfo);
                 }
                 mLocalAudioListAdapter.setAudioInfos(AudioListDaoManager.getInstance().getLocalListInfo().getRefreshList());
@@ -132,8 +134,8 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
                 mLocalAudioListAdapter.notifyDataSetChanged();
                 break;
             case R.id.tv_add:
-                if (!PlayList.getInstance().add(mLocalAudioListAdapter.getSelectedItem())){
-                    ToastUtil.makeShortToast(getContext(),"加入了除去列表中已经存在的歌曲");
+                if (!PlayList.getInstance().add(mLocalAudioListAdapter.getSelectedItem())) {
+                    ToastUtil.makeShortToast(getContext(), "加入了除去列表中已经存在的歌曲");
                 }
                 updateEditMode(false);
                 mLocalAudioListAdapter.setEditMode(true);
@@ -151,14 +153,14 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
         }
     }
 
-    private void updateEditMode(boolean isEditing){
-        if (isEditing){
+    private void updateEditMode(boolean isEditing) {
+        if (isEditing) {
             tv_delete.setVisibility(View.INVISIBLE);
             tv_add.setVisibility(View.INVISIBLE);
             tv_search.setVisibility(View.VISIBLE);
             tv_choose_all.setVisibility(View.INVISIBLE);
             tv_edit.setText(R.string.local_list_edit);
-        }else {
+        } else {
             tv_delete.setVisibility(View.VISIBLE);
             tv_add.setVisibility(View.VISIBLE);
             tv_search.setVisibility(View.INVISIBLE);
@@ -167,13 +169,13 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
         }
     }
 
-    private void updateSearching(){
-        if (mIsSearching){
+    private void updateSearching() {
+        if (mIsSearching) {
             pb_search.setVisibility(View.VISIBLE);
             tv_choose_all.setVisibility(View.INVISIBLE);
             tv_edit.setVisibility(View.INVISIBLE);
             tv_search.setText(R.string.local_list_search_cancel);
-        }else {
+        } else {
             pb_search.setVisibility(View.INVISIBLE);
             tv_search.setText(R.string.local_list_search);
             tv_edit.setVisibility(View.VISIBLE);
@@ -188,8 +190,8 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
         searchAudio();
     }
 
-    private void searchAudio(){
-        new Thread(){
+    private void searchAudio() {
+        new Thread() {
             @Override
             public void run() {
                 super.run();
@@ -197,13 +199,13 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
                         .listAvaliableStorage(getActivity().getApplicationContext());
                 for (int i = 0; i < list.size(); i++) {
                     StorageInfo storageInfo = list.get(i);
-                    if (!mIsSearching){
+                    if (!mIsSearching) {
                         break;
                     }
                     MediaUtil.scanLocalAudioFile(storageInfo.path, new MediaUtil.ForeachListener() {
                         @Override
                         public void foreach(AudioInfo audioInfo) {
-                            if (AudioListDaoManager.getInstance().insertAudioToList(audioInfo,AudioListDaoManager.getInstance().getLocalListInfo())){
+                            if (AudioListDaoManager.getInstance().insertAudioToList(audioInfo, AudioListDaoManager.getInstance().getLocalListInfo())) {
                                 Log.d(TAG, "foreach: 加入");
                             }
                         }
@@ -230,7 +232,7 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
 
     }
 
-    private class MyLocalListItemOnClickListener implements LocalAudioListAdapter.LocalListItemOnClickListener {
+    private class MyLocalListItemOnClickListener implements BaseOnItemClickListener {
 
         @Override
         public void onItemClick(int index) {

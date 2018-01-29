@@ -20,6 +20,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 
 import yanzhikai.simpleplayer.R;
+import yanzhikai.simpleplayer.adapter.BaseOnItemClickListener;
 import yanzhikai.simpleplayer.adapter.PlayListAdapter;
 import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.event.PlayListChangedEvent;
@@ -165,7 +166,7 @@ public class PlayListFragment extends Fragment {
         }
     }
 
-    private class MyPlayListListener implements PlayListAdapter.PlayListItemOnClickListener {
+    private class MyPlayListListener implements BaseOnItemClickListener {
         @Override
         public void onItemClick(int index) {
             EventBus.getDefault().post(new AudioEvent(index,AUDIO_PLAY_CHOSEN));
