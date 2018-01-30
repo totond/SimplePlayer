@@ -2,11 +2,14 @@ package yanzhikai.simpleplayer.model;
 
 import android.util.Log;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import yanzhikai.simpleplayer.db.PlayListAudioDaoManager;
+import yanzhikai.simpleplayer.event.AudioEvent;
 
 /**
  * author : yany
@@ -38,7 +41,6 @@ public class PlayList {
         if (PlayListAudioDaoManager.getInstance().queryPlayingAudio().size() > 0) {
             setCurrentIndex(PlayListAudioDaoManager.getInstance().queryPlayingAudio().get(0).getIndex());
         }
-        Log.e(TAG, "initData:  当前是"+mCurrentIndex);
     }
 
     private static final PlayList instance = new PlayList();
@@ -98,18 +100,27 @@ public class PlayList {
     public void clear() {
         mAudioList.clear();
         PlayListAudioDaoManager.getInstance().deleteAll();
+        EventBus.getDefault().post(new AudioEvent(AudioEvent.AUDIO_NULL));
+    }
+
+    public void noMusic(){
+        mCurrentIndex = -1;
+        mCurrentAudio = null;
     }
 
     public Boolean isExist(AudioInfo info) {
         return PlayListAudioDaoManager.getInstance().isExist(info.getAudioHash());
     }
 
+    //设置当前歌曲信息
     public void setCurrentAudio(AudioInfo audioInfo,int index) {
-        PlayingAudioInfo playingAudioInfo = new PlayingAudioInfo(audioInfo);
-        playingAudioInfo.setCurrentTime(0);
-        playingAudioInfo.setCurrentTimeText("00:00");
-        playingAudioInfo.setIndex(index);
-        PlayListAudioDaoManager.getInstance().setPlayingAudio(playingAudioInfo);
+        if (audioInfo != null) {
+            PlayingAudioInfo playingAudioInfo = new PlayingAudioInfo(audioInfo);
+            playingAudioInfo.setCurrentTime(0);
+            playingAudioInfo.setCurrentTimeText("00:00");
+            playingAudioInfo.setIndex(index);
+            PlayListAudioDaoManager.getInstance().setPlayingAudio(playingAudioInfo);
+        }
         mCurrentIndex = index;
         mCurrentAudio = audioInfo;
 
@@ -179,8 +190,8 @@ public class PlayList {
         this.mCurrentIndex = currentIndex;
     }
 
-    public AudioInfo getCurrentAudio() {
-        if (mCurrentAudio == null && mAudioList.size() > 0){
+    public AudioInfo getCurrentAudio(boolean canNull) {
+        if (mCurrentAudio == null && mAudioList.size() > 0 && !canNull){
             setCurrentAudio(mAudioList.get(0),0);
         }
         return mCurrentAudio;

@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -16,31 +15,30 @@ import java.util.List;
 
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.model.AudioInfo;
-import yanzhikai.simpleplayer.model.AudioListInfo;
 
 /**
  * author : yany
  * e-mail : yanzhikai_yjk@qq.com
- * time   : 2018/01/29
+ * time   : 2018/01/30
  * desc   :
  */
 
-public class ShowListAdapter extends RecyclerView.Adapter{
+public class AudioListAdapter extends RecyclerView.Adapter {
     public static final String TAG = "yjkAdapter";
     private Context mContext;
-    private List<AudioListInfo> mAudioListInfos;
+    private List<AudioInfo> mAudioInfos;
     private BaseOnItemClickListener mListener;
+    private int mCurrentIndex = -1;
 
     private boolean isEditMode = false;
     private SparseBooleanArray mSelectedPositions = new SparseBooleanArray();
 
-    public ShowListAdapter(Context context, List<AudioListInfo> audioInfos) {
+    public AudioListAdapter(Context context, List<AudioInfo> audioInfos) {
         mContext = context;
-        mAudioListInfos = audioInfos;
+        mAudioInfos = audioInfos;
     }
 
     private void setItemChecked(int position, boolean isChecked) {
-        Log.d(TAG, "setItemChecked: " + position + " state: " + isChecked);
         mSelectedPositions.put(position, isChecked);
     }
 
@@ -55,9 +53,7 @@ public class ShowListAdapter extends RecyclerView.Adapter{
 
     //全选
     public void selectAllItems(){
-        //让数组启动初始化
         setItemChecked(getItemCount() - 1, mSelectedPositions.get(getItemCount() - 1));
-
         for (int i = 0; i < mSelectedPositions.size(); i++){
             setItemChecked(i,true);
         }
@@ -66,25 +62,25 @@ public class ShowListAdapter extends RecyclerView.Adapter{
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.d(TAG, "onCreateViewHolder: ");
-        View view = LayoutInflater.from(mContext).inflate(R.layout.show_audio_list_item, null, false);
-        return new ShowAudioListViewHolder(view);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.audio_list_item, null, false);
+        return new AudioListViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        final ShowAudioListViewHolder showAudioListViewHolder = (ShowAudioListViewHolder) holder;
-        showAudioListViewHolder.tv_list_name.setText(mAudioListInfos.get(position).getListName());
-        showAudioListViewHolder.tv_list_size.setText(String.format(mContext.getString(R.string.audio_show_unit),mAudioListInfos.get(position).getInfoList().size()));
-        showAudioListViewHolder.setEditMode(isEditMode);
+        final AudioListViewHolder audioListViewHolder = (AudioListViewHolder) holder;
+        audioListViewHolder.tv_song_name.setText(mAudioInfos.get(position).getSongName());
+        audioListViewHolder.tv_singer_name.setText(mAudioInfos.get(position).getSingerName());
+        audioListViewHolder.tv_duration.setText(mAudioInfos.get(position).getDurationText());
+        audioListViewHolder.tv_index.setText(String.valueOf(position));
+        audioListViewHolder.setEditMode(isEditMode);
+        audioListViewHolder.cb_check.setChecked(isItemChecked(position));
 
-        showAudioListViewHolder.cb_check.setChecked(isItemChecked(position));
-
-        showAudioListViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        audioListViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "onClick: " + position);
                 if (isEditMode) {
-                Log.d(TAG, "onEditClick: " + position);
+
                     if (isItemChecked(position)) {
                         setItemChecked(position, false);
                     } else {
@@ -103,46 +99,53 @@ public class ShowListAdapter extends RecyclerView.Adapter{
 
     @Override
     public int getItemCount() {
-        return mAudioListInfos.size();
+        return mAudioInfos.size();
     }
 
-    private class ShowAudioListViewHolder extends RecyclerView.ViewHolder {
-        public TextView tv_list_name, tv_list_size;
+    private class AudioListViewHolder extends RecyclerView.ViewHolder {
+        public TextView tv_song_name, tv_singer_name, tv_duration, tv_index;
         public AudioInfo audioInfo;
+        public int audioIndex;
         public View itemView;
         public CheckBox cb_check;
-        public ImageView iv_enter;
 
-        public ShowAudioListViewHolder(View itemView) {
+        public AudioListViewHolder(View itemView) {
             super(itemView);
             this.itemView = itemView;
-            tv_list_name = itemView.findViewById(R.id.tv_list_name);
-            tv_list_size = itemView.findViewById(R.id.tv_list_size);
+            tv_song_name = itemView.findViewById(R.id.tv_song_name);
+            tv_singer_name = itemView.findViewById(R.id.tv_singer_name);
+            tv_duration = itemView.findViewById(R.id.tv_duration);
+            tv_index = itemView.findViewById(R.id.tv_index);
             cb_check = itemView.findViewById(R.id.cb_check);
-            iv_enter = itemView.findViewById(R.id.iv_enter);
+
         }
 
         public void setEditMode(boolean editMode) {
             if (editMode) {
                 cb_check.setVisibility(View.VISIBLE);
-                iv_enter.setVisibility(View.INVISIBLE);
+                tv_index.setVisibility(View.INVISIBLE);
             } else {
                 cb_check.setVisibility(View.GONE);
-                iv_enter.setVisibility(View.VISIBLE);
+                tv_index.setVisibility(View.VISIBLE);
             }
         }
 
     }
 
 
-    public ArrayList<AudioListInfo> getSelectedItem() {
-        ArrayList<AudioListInfo> selectList = new ArrayList<>();
-        for (int i = 0; i < mAudioListInfos.size(); i++) {
+    //获取选中Item信息
+    public ArrayList<AudioInfo> getSelectedItem() {
+        ArrayList<AudioInfo> selectList = new ArrayList<>();
+        for (int i = 0; i < mAudioInfos.size(); i++) {
             if (isItemChecked(i)) {
-                selectList.add(mAudioListInfos.get(i));
+                selectList.add(mAudioInfos.get(i));
             }
         }
         return selectList;
+    }
+
+    public List<AudioInfo> getAudioInfos() {
+        return mAudioInfos;
     }
 
     public void setEditMode(boolean isEditMode) {
@@ -153,20 +156,12 @@ public class ShowListAdapter extends RecyclerView.Adapter{
         return isEditMode;
     }
 
-    public void setAudioListInfos(List<AudioListInfo> audioListInfos) {
-        this.mAudioListInfos = audioListInfos;
-    }
 
-    public List<AudioListInfo> getAudioListInfos() {
-        return mAudioListInfos;
+    public void setAudioInfos(List<AudioInfo> audioInfos) {
+        this.mAudioInfos = audioInfos;
     }
 
     public void setOnClickListener(BaseOnItemClickListener listener) {
         this.mListener = listener;
     }
-
-    public interface ListOnSelectListener {
-        void onItemSelected(int index);
-    }
 }
-

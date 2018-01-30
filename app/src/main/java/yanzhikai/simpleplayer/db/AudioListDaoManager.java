@@ -292,6 +292,14 @@ public class AudioListDaoManager {
         }
     }
 
+    public boolean insertAudiosToList(List<AudioInfo> infoList, AudioListInfo audioListInfo){
+        boolean flag = true;
+        for (AudioInfo audioInfo : infoList){
+            flag &= insertAudioToList(audioInfo,audioListInfo);
+        }
+        return flag;
+    }
+
     public JoinListWithAudio queryJoin(String md5){
         return getDaoSession().getJoinListWithAudioDao().load(md5);
     }
@@ -315,8 +323,8 @@ public class AudioListDaoManager {
      */
 
     public AudioListInfo getLocalListInfo() {
-        return mLocalListInfo;
-//        return queryAudioListByQueryBuilder(LOCAL_LIST_NAME).get(0);
+//        return mLocalListInfo;
+        return queryAudioListByName(LOCAL_LIST_NAME);
     }
 
     public List<AudioListInfo> getRefreshListInfos(){

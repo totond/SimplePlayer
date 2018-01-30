@@ -27,6 +27,7 @@ import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.adapter.BaseOnItemClickListener;
 import yanzhikai.simpleplayer.adapter.LocalAudioListAdapter;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;
+import yanzhikai.simpleplayer.event.AudioItemAddEvent;
 import yanzhikai.simpleplayer.event.LocalListChangedEvent;
 import yanzhikai.simpleplayer.event.PlayListChangedEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
@@ -42,7 +43,7 @@ import yanzhikai.simpleplayer.utils.ToastUtil;
  */
 @RuntimePermissions
 public class LocalAudioListFragment extends Fragment implements View.OnClickListener {
-    public static final String TAG = "LocalAudioListFragment";
+    public static final String TAG = "yjkLocalListFragment";
 
     private RecyclerView rv_local_list;
     private LocalAudioListAdapter mLocalAudioListAdapter;
@@ -134,14 +135,7 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
                 mLocalAudioListAdapter.notifyDataSetChanged();
                 break;
             case R.id.tv_add:
-                if (!PlayList.getInstance().add(mLocalAudioListAdapter.getSelectedItem())) {
-                    ToastUtil.makeShortToast(getContext(), "加入了除去列表中已经存在的歌曲");
-                }
-                updateEditMode(false);
-                mLocalAudioListAdapter.setEditMode(true);
-                mLocalAudioListAdapter.clearSelected();
-                EventUtil.post(new PlayListChangedEvent(PlayListChangedEvent.ITEM_ADDED));
-                mLocalAudioListAdapter.notifyDataSetChanged();
+                addAudioToLeft();
                 break;
             case R.id.tv_search:
                 LocalAudioListFragmentPermissionsDispatcher.searchWithPermissionCheck(this);
@@ -151,6 +145,19 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
                 mLocalAudioListAdapter.notifyDataSetChanged();
                 break;
         }
+    }
+
+    private void addAudioToLeft(){
+        //                if (!PlayList.getInstance().add(mLocalAudioListAdapter.getSelectedItem())) {
+//                    ToastUtil.makeShortToast(getContext(), "加入了除去列表中已经存在的歌曲");
+//                }
+        Log.d(TAG, "tv_add: " + mLocalAudioListAdapter.getSelectedItem().size());
+        EventUtil.post(new AudioItemAddEvent(mLocalAudioListAdapter.getSelectedItem()));
+        updateEditMode(true);
+        mLocalAudioListAdapter.setEditMode(false);
+        mLocalAudioListAdapter.clearSelected();
+//                EventUtil.post(new PlayListChangedEvent(PlayListChangedEvent.ITEM_ADDED));
+        mLocalAudioListAdapter.notifyDataSetChanged();
     }
 
     private void updateEditMode(boolean isEditing) {

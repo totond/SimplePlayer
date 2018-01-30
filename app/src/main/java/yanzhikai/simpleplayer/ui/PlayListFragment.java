@@ -8,6 +8,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +35,7 @@ import static yanzhikai.simpleplayer.event.AudioEvent.AUDIO_PLAY_CHOSEN;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PlayListFragment extends Fragment {
+public class PlayListFragment extends Fragment implements View.OnClickListener{
     private RecyclerView rv_play_list;
     private PlayListAdapter mPlayListAdapter;
     private TextView tv_edit,tv_delete,tv_choose_all;
@@ -74,9 +75,21 @@ public class PlayListFragment extends Fragment {
 
 
         tv_edit = rootView.findViewById(R.id.tv_edit);
-        tv_edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        tv_edit.setOnClickListener(this);
+
+        tv_delete = rootView.findViewById(R.id.tv_delete);
+        tv_delete.setOnClickListener(this);
+
+        tv_choose_all = rootView.findViewById(R.id.tv_choose_all);
+        tv_choose_all.setOnClickListener(this);
+        handleCurrentAudioChanged();
+        return rootView;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.tv_edit:
                 if (mPlayListAdapter.getEditMode()){
                     updateEditMode(true);
                     mPlayListAdapter.setEditMode(false);
@@ -88,13 +101,8 @@ public class PlayListFragment extends Fragment {
                 }
 
                 mPlayListAdapter.notifyDataSetChanged();
-            }
-        });
-
-        tv_delete = rootView.findViewById(R.id.tv_delete);
-        tv_delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                break;
+            case R.id.tv_delete:
                 ArrayList<AudioInfo> deleteList = mPlayListAdapter.getSelectedItem();
                 boolean flag = true;
                 for (AudioInfo audioInfo : deleteList) {
@@ -103,22 +111,13 @@ public class PlayListFragment extends Fragment {
                 mPlayListAdapter.clearSelected();
                 mPlayListAdapter.notifyDataSetChanged();
                 ToastUtil.makeShortToast(PlayListFragment.this.getContext(),"删除了"+deleteList.size() + "首歌" + flag);
-            }
-        });
-
-        tv_choose_all = rootView.findViewById(R.id.tv_choose_all);
-        tv_choose_all.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                break;
+            case R.id.tv_choose_all:
                 mPlayListAdapter.selectAllItems();
                 mPlayListAdapter.notifyDataSetChanged();
-            }
-        });
-        handleCurrentAudioChanged();
-        return rootView;
+                break;
+        }
     }
-
-
 
     private void handleCurrentAudioChanged(){
         mPlayListAdapter.refreshItem();
@@ -136,6 +135,7 @@ public class PlayListFragment extends Fragment {
                 handleCurrentAudioChanged();
                 break;
             case PlayListChangedEvent.ITEM_ADDED:
+                Log.d("yjk", "handleListChanged: ITEM_ADDED");
                 mPlayListAdapter.notifyDataSetChanged();
                 rv_play_list.smoothScrollToPosition(mPlayListAdapter.getItemCount() - 1);
                 break;
@@ -169,7 +169,9 @@ public class PlayListFragment extends Fragment {
     private class MyPlayListListener implements BaseOnItemClickListener {
         @Override
         public void onItemClick(int index) {
-            EventBus.getDefault().post(new AudioEvent(index,AUDIO_PLAY_CHOSEN));
+            AudioEvent audioEvent = new AudioEvent(AUDIO_PLAY_CHOSEN);
+            audioEvent.setAudioIndex(index);
+            EventBus.getDefault().post(audioEvent);
         }
     }
 

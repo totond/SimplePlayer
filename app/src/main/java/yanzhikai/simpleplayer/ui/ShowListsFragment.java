@@ -18,9 +18,12 @@ import android.widget.TextView;
 import java.util.List;
 
 import yanzhikai.simpleplayer.R;
+import yanzhikai.simpleplayer.adapter.BaseOnItemClickListener;
 import yanzhikai.simpleplayer.adapter.ShowListAdapter;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;
+import yanzhikai.simpleplayer.event.OpenAudioListEvent;
 import yanzhikai.simpleplayer.model.AudioListInfo;
+import yanzhikai.simpleplayer.utils.EventUtil;
 import yanzhikai.simpleplayer.utils.ToastUtil;
 
 /**
@@ -52,7 +55,8 @@ public class ShowListsFragment extends Fragment implements View.OnClickListener 
         rv_show_list = rootView.findViewById(R.id.rv_show_list);
         rv_show_list.setLayoutManager(new LinearLayoutManager(getContext()));
         DividerItemDecoration divider = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
-        mShowListAdapter = new ShowListAdapter(getContext(),AudioListDaoManager.getInstance().getRefreshListInfos());
+        mShowListAdapter = new ShowListAdapter(getContext(), AudioListDaoManager.getInstance().getRefreshListInfos());
+        mShowListAdapter.setOnClickListener(new ShowListItemClickListener());
         rv_show_list.setAdapter(mShowListAdapter);
         rv_show_list.addItemDecoration(divider);
 
@@ -61,7 +65,7 @@ public class ShowListsFragment extends Fragment implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.tv_new:
                 Log.d(TAG, "onClick: tv_new");
                 showInputDialog();
@@ -69,9 +73,10 @@ public class ShowListsFragment extends Fragment implements View.OnClickListener 
             case R.id.tv_delete:
                 if (mShowListAdapter.getEditMode()) {
                     mShowListAdapter.setEditMode(false);
-                    if (AudioListDaoManager.getInstance().deleteAudioList(mShowListAdapter.getSelectedItem())){
+                    Log.d(TAG, "delete: " + mShowListAdapter.getSelectedItem().size());
+                    if (AudioListDaoManager.getInstance().deleteAudioList(mShowListAdapter.getSelectedItem())) {
                         Log.d(TAG, "delete: succeeded");
-                    }else {
+                    } else {
                         Log.d(TAG, "delete: failed");
                     }
                     mShowListAdapter.clearSelected();
@@ -96,12 +101,14 @@ public class ShowListsFragment extends Fragment implements View.OnClickListener 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         AudioListInfo listInfo = new AudioListInfo(editText.getText().toString());
-                        String str = String.format(getString(R.string.audio_show_list_succeed),listInfo.getListName());
+                        String str = String.format(getString(R.string.audio_show_list_succeed), listInfo.getListName());
 
-                        if (AudioListDaoManager.getInstance().insertList(listInfo)){
-                            ToastUtil.makeShortToast(ShowListsFragment.this.getActivity(),str);
+                        if (AudioListDaoManager.getInstance().insertList(listInfo)) {
+                            ToastUtil.makeShortToast(ShowListsFragment.this.getActivity(), str);
                             mShowListAdapter.setAudioListInfos(AudioListDaoManager.getInstance().getRefreshListInfos());
                             mShowListAdapter.notifyDataSetChanged();
+                        }else {
+                            ToastUtil.makeShortToast(ShowListsFragment.this.getContext(),getString(R.string.audio_show_list_existed));
                         }
 
                     }
@@ -113,5 +120,13 @@ public class ShowListsFragment extends Fragment implements View.OnClickListener 
             }
         });
         inputDialog.show();
+    }
+
+    private class ShowListItemClickListener implements BaseOnItemClickListener{
+
+        @Override
+        public void onItemClick(int index) {
+            EventUtil.post(new OpenAudioListEvent(mShowListAdapter.getAudioListInfos().get(index).getListName()));
+        }
     }
 }

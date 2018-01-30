@@ -26,13 +26,20 @@ public class AudioEvent {
 
     private float mProgress;
 
-    public AudioEvent(int index, int type){
-        mAudioIndex = index;
+    public AudioEvent(int type){
         mType = type;
     }
 
     public void setInfo(AudioInfo info) {
         this.mInfo = info;
+    }
+
+    public AudioInfo getInfo() {
+        return mInfo;
+    }
+
+    public void setAudioIndex(int audioIndex) {
+        this.mAudioIndex = audioIndex;
     }
 
     public int getAudioIndex() {

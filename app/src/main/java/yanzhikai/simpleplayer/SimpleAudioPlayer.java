@@ -104,8 +104,8 @@ public class SimpleAudioPlayer {
     }
 
 
-    public boolean isPlaying(){
-        return mMediaPlayer.isPlaying();
+    public boolean isPlaying() {
+        return mMediaPlayer != null && mMediaPlayer.isPlaying();
     }
 
     public void reset() {

@@ -53,6 +53,7 @@ public class AudioPlayerService extends Service {
     private static final String ACTION_PRE = "PRE";
     private static final String ACTION_NEXT = "NEXT";
 
+
     /**
      * 状态栏播放器视图
      */
@@ -95,7 +96,6 @@ public class AudioPlayerService extends Service {
         Intent intentNext = new Intent(ACTION_NEXT);
         PendingIntent pIntentNext = PendingIntent.getBroadcast(this.getApplicationContext(),
                 REQUEST_CODE, intentNext, PendingIntent.FLAG_UPDATE_CURRENT);
-
 
         Notification.Builder builder = new Notification.Builder
                 (this.getApplicationContext()); //获取一个Notification构造器
@@ -140,13 +140,20 @@ public class AudioPlayerService extends Service {
     }
 
     private void playStart() {
-        if (isPrepared) {
-            mAudioPlayer.start();
+        if (PlayList.getInstance().getCurrentAudio(true) != null){
+            if (isPrepared) {
+                mAudioPlayer.start();
+                Log.d(TAG, "playStart: ");
+                startPlayingThread();
+                isPlaying = true;
+                EventBus.getDefault().post(new AudioStartPauseEvent(true));
+                updateNotification();
+            }
+            Log.d(TAG, "playStart: failer");
+        }else {
+            playNext();
         }
-        startPlayingThread();
-        isPlaying = true;
-        EventBus.getDefault().post(new AudioStartPauseEvent(true));
-        updateNotification();
+
     }
 
     private void playPause() {
@@ -160,26 +167,31 @@ public class AudioPlayerService extends Service {
 
     private void playNext() {
         AudioInfo audioInfo = PlayList.getInstance().getNextAudio(false);
-        mAudioPlayer.setPath(audioInfo.getFilePath());
-        mAudioPlayer.prepareAsync();
+        if (audioInfo != null){
+            mAudioPlayer.setPath(audioInfo.getFilePath());
+            mAudioPlayer.prepareAsync();
 //        PlayList.getInstance().setCurrentAudio(audioInfo);
-        startPlayingThread();
-        notifyAudioChanged();
-        isPlaying = true;
-        EventBus.getDefault().post(new AudioStartPauseEvent(true));
-        updateNotification();
+            startPlayingThread();
+            notifyAudioChanged();
+            isPlaying = true;
+            EventBus.getDefault().post(new AudioStartPauseEvent(true));
+            updateNotification();
+        }
+
     }
 
     private void playPre() {
         AudioInfo audioInfo = PlayList.getInstance().getNextAudio(true);
-        mAudioPlayer.setPath(audioInfo.getFilePath());
-        mAudioPlayer.prepareAsync();
+        if (audioInfo != null) {
+            mAudioPlayer.setPath(audioInfo.getFilePath());
+            mAudioPlayer.prepareAsync();
 //        PlayList.getInstance().setCurrentAudio(audioInfo);
-        startPlayingThread();
-        notifyAudioChanged();
-        isPlaying = true;
-        EventBus.getDefault().post(new AudioStartPauseEvent(true));
-        updateNotification();
+            startPlayingThread();
+            notifyAudioChanged();
+            isPlaying = true;
+            EventBus.getDefault().post(new AudioStartPauseEvent(true));
+            updateNotification();
+        }
     }
 
     private void updateNotification() {
@@ -188,7 +200,7 @@ public class AudioPlayerService extends Service {
         } else {
             mNotificationRemoteViews.setImageViewResource(R.id.iv_play_pause, R.mipmap.play);
         }
-        AudioInfo audioInfo = PlayList.getInstance().getCurrentAudio();
+        AudioInfo audioInfo = PlayList.getInstance().getCurrentAudio(true);
         if (audioInfo != null) {
             mNotificationRemoteViews.setTextViewText(R.id.tv_title, audioInfo.getSongName());
         } else {
@@ -202,7 +214,12 @@ public class AudioPlayerService extends Service {
         Log.d(TAG, "handleEvent: " + event.getType());
         switch (event.getType()) {
             case AudioEvent.AUDIO_NULL:
-
+                PlayList.getInstance().noMusic();
+                mAudioPlayer.release();
+                stopPlayingThread();
+                isPlaying = false;
+                EventBus.getDefault().post(new AudioStartPauseEvent(false));
+                updateNotification();
                 break;
             case AudioEvent.AUDIO_PLAY:
                 playStart();
@@ -236,10 +253,9 @@ public class AudioPlayerService extends Service {
                 break;
             case AudioEvent.AUDIO_SEEK_TO:
 //                if (mAudioPlayer.isPlaying()) {
-                AudioInfo audioInfo = PlayList.getInstance().getCurrentAudio();
+                AudioInfo audioInfo = PlayList.getInstance().getCurrentAudio(true);
                 if (audioInfo != null) {
-                    Log.i(TAG, "seek to: " + (long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
-                    mAudioPlayer.seekTo((long) (event.getProgress() * PlayList.getInstance().getCurrentAudio().getDuration()));
+                    mAudioPlayer.seekTo((long) (event.getProgress() * PlayList.getInstance().getCurrentAudio(true).getDuration()));
                 }
 //                }
                 break;
@@ -253,7 +269,7 @@ public class AudioPlayerService extends Service {
 
     private void handlePlayingDetail() {
         if (!isSeeking) {
-            AudioInfo currentInfo = PlayList.getInstance().getCurrentAudio();
+            AudioInfo currentInfo = PlayList.getInstance().getCurrentAudio(true);
             if (currentInfo != null) {
                 CurrentAudioDetailEvent detailEvent = new CurrentAudioDetailEvent();
                 detailEvent.durationText = currentInfo.getDurationText();

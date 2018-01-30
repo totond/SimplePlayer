@@ -5,7 +5,6 @@ import android.animation.ValueAnimator;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
@@ -22,19 +21,27 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
+import yanzhikai.simpleplayer.base.BaseAnimatorListener;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;
 import yanzhikai.simpleplayer.event.AudioEvent;
+import yanzhikai.simpleplayer.event.AudioItemAddEvent;
+import yanzhikai.simpleplayer.event.AudioListChangedEvent;
 import yanzhikai.simpleplayer.event.AudioStartPauseEvent;
 import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
 import yanzhikai.simpleplayer.event.LocalListChangedEvent;
+import yanzhikai.simpleplayer.event.OpenAudioListEvent;
+import yanzhikai.simpleplayer.event.PlayListChangedEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.AudioListInfo;
+import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.service.AudioPlayerService;
+import yanzhikai.simpleplayer.ui.AudioListFragment;
 import yanzhikai.simpleplayer.ui.LocalAudioListFragment;
 import yanzhikai.simpleplayer.ui.PlayListFragment;
 import yanzhikai.simpleplayer.ui.ShowListsFragment;
 import yanzhikai.simpleplayer.utils.EventUtil;
 import yanzhikai.simpleplayer.utils.ScreenUtils;
+import yanzhikai.simpleplayer.utils.ToastUtil;
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
     public static final String TAG = "yjkMainActivity";
@@ -42,6 +49,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private static final String LOCAL_AUDIO_LIST_FRAGMENT_TAG = "LocalAudioListFragment";
     private static final String PLAY_LIST_FRAGMENT_NAME = "PlayList";
     private static final String SHOW_LIST_FRAGMENT_NAME = "ShowList";
+    private static final String AUDIO_LIST_FRAGMENT_NAME = "AudioList";
     private static final String LEFT_FRAGMENT_TAG = "LeftFragment";
     private static final String RIGHT_FRAGMENT_TAG = "RightFragment";
     private ImageView btn_pre, btn_play_pause, btn_next;
@@ -78,7 +86,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private void initView() {
         btn_pre = findViewById(R.id.btn_pre);
-        btn_play_pause = findViewById(R.id.btn_pause);
+        btn_play_pause = findViewById(R.id.btn_play_pause);
         btn_next = findViewById(R.id.btn_next);
         btn_choose = findViewById(R.id.btn_choose);
         sb_progress = findViewById(R.id.sb_progress);
@@ -146,25 +154,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
             }
         });
-        valueAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-
-            }
-
+        valueAnimator.addListener(new BaseAnimatorListener() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 EventUtil.post(new LocalListChangedEvent(LocalListChangedEvent.ANIMATION_FINISH));
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-
             }
         });
         valueAnimator.setDuration(500);
@@ -177,16 +170,43 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         updateProgress(event.progress);
     }
 
-//    @Subscribe(threadMode = ThreadMode.MAIN)
-//    public void handleAudioChanged(AudioChangedEventPlay changedEvent){
-//        mPlayListAdapter.refreshItem();
-//        rv_play_list.smoothScrollToPosition(PlayList.getInstance().getCurrentIndex());
-//    }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleOpenList(OpenAudioListEvent openAudioListEvent) {
+        loadLeftFragmentWithStack(AudioListFragment.newInstance(openAudioListEvent.getListName()), AUDIO_LIST_FRAGMENT_NAME);
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleAudioStartPause(AudioStartPauseEvent startPauseEvent) {
         Log.d(TAG, "handleAudioStartPause: ");
         updateStartAndPause(startPauseEvent.getIsPause());
+    }
+
+    @Subscribe
+    public void handleAudioItemAdd(AudioItemAddEvent audioItemAddEvent) {
+        Log.d(TAG, "handleAudioItemAdd: size" + audioItemAddEvent.getInfoList().size());
+        Fragment currentLeftFragment = getSupportFragmentManager().findFragmentByTag(LEFT_FRAGMENT_TAG);
+        if (currentLeftFragment instanceof PlayListFragment) {
+            if (!PlayList.getInstance().add(audioItemAddEvent.getInfoList())) {
+                ToastUtil.makeShortToast(this, "加入了除去列表中已经存在的歌曲");
+                Log.d(TAG, "handleAudioItemAdd: PlayListFragment failed");
+            }
+            Log.d(TAG, "handleAudioItemAdd: PlayListFragment");
+            EventUtil.post(new PlayListChangedEvent(PlayListChangedEvent.ITEM_ADDED));
+        } else if (currentLeftFragment instanceof AudioListFragment) {
+            if (!AudioListDaoManager.getInstance().
+                    insertAudiosToList(
+                            audioItemAddEvent.getInfoList(),
+                            AudioListDaoManager.getInstance().
+                                    queryAudioListByName(((AudioListFragment) currentLeftFragment).getListName())
+                    )) {
+                ToastUtil.makeShortToast(this, "加入了除去列表中已经存在的歌曲");
+                Log.d(TAG, "handleAudioItemAdd: AudioListFragment failed");
+            }
+            EventUtil.post(new AudioListChangedEvent(AudioListChangedEvent.ITEM_ADDED));
+            Log.d(TAG, "handleAudioItemAdd: AudioListFragment");
+        } else {
+            ToastUtil.makeShortToast(this, "当前左边列表不可以加入歌曲");
+        }
     }
 
     private void updateProgress(float progress) {
@@ -227,13 +247,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
 //                Log.d(TAG, "PlayList.getInstance().getAudioList(): " + PlayList.getInstance().getAudioList().size());
 //                updateList();
-                EventBus.getDefault().post(new AudioEvent(-1, AudioEvent.AUDIO_PRE));
+                EventBus.getDefault().post(new AudioEvent( AudioEvent.AUDIO_PRE));
                 break;
-            case R.id.btn_pause:
+            case R.id.btn_play_pause:
                 if (AudioPlayerService.isPlaying) {
-                    EventBus.getDefault().post(new AudioEvent(-1, AudioEvent.AUDIO_PAUSE));
+                    EventBus.getDefault().post(new AudioEvent(AudioEvent.AUDIO_PAUSE));
                 } else {
-                    EventBus.getDefault().post(new AudioEvent(-1, AudioEvent.AUDIO_PLAY));
+                    EventBus.getDefault().post(new AudioEvent(AudioEvent.AUDIO_PLAY));
                 }
                 break;
             case R.id.btn_next:
@@ -242,14 +262,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //                playingAudioInfo.setCurrentTime(0);
 //                playingAudioInfo.setCurrentTimeText("00:00");
 //                PlayListAudioDaoManager.getInstance().setPlayingAudio(playingAudioInfo);
-                EventBus.getDefault().post(new AudioEvent(-1, AudioEvent.AUDIO_NEXT));
+                EventBus.getDefault().post(new AudioEvent(AudioEvent.AUDIO_NEXT));
                 break;
             case R.id.btn_choose:
 //                mAudioPlayer.setPath("/storage/emulated/0/Music/陈奕迅 - 陀飞轮.mp3");
 //                mAudioPlayer.prepareAsync();
 //                startActivity(new Intent(this, ScanActivity.class));
 //                openOrCloseRightFragment();
-                popFragment();
+                openOrCloseRightFragment();
 
                 break;
             case R.id.ly_local_btn:
@@ -258,7 +278,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 break;
             case R.id.ly_audios_btn:
                 openOrCloseRightFragment();
-                loadLeftFragmentWithStack(new ShowListsFragment(),SHOW_LIST_FRAGMENT_NAME);
+                loadLeftFragmentWithStack(new ShowListsFragment(), SHOW_LIST_FRAGMENT_NAME);
                 break;
             case R.id.ly_timer_btn:
 
@@ -299,13 +319,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
 //            canUpdate = false;
-            AudioEvent audioEvent = new AudioEvent(-1, AudioEvent.AUDIO_SEEK_START);
+            AudioEvent audioEvent = new AudioEvent(AudioEvent.AUDIO_SEEK_START);
             EventBus.getDefault().post(audioEvent);
         }
 
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
-            AudioEvent audioEvent = new AudioEvent(-1, AudioEvent.AUDIO_SEEK_TO);
+            AudioEvent audioEvent = new AudioEvent(AudioEvent.AUDIO_SEEK_TO);
             audioEvent.setProgress(sb_progress.getProgress() / 1000f);
             EventBus.getDefault().post(audioEvent);
 //            canUpdate = true;
@@ -335,10 +355,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-    private void popFragment(){
-        getSupportFragmentManager().popBackStack();
-        if (getSupportFragmentManager().getBackStackEntryCount() == 0){
+    private void popFragment() {
+
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             Log.d(TAG, "popFragment: 0");
+            getSupportFragmentManager().popBackStack();
         }
     }
 
@@ -359,14 +380,14 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     }
 
     public void loadLeftFragmentWithStack(Fragment fragment, String name) {
-        Fragment newFragment = getSupportFragmentManager().findFragmentByTag(LEFT_FRAGMENT_TAG);
-        if (newFragment != null) {
-            removeFragment(LEFT_FRAGMENT_TAG);
-        }
+//        Fragment newFragment = getSupportFragmentManager().findFragmentByTag(LEFT_FRAGMENT_TAG);
+//        if (newFragment != null) {
+//            removeFragment(LEFT_FRAGMENT_TAG);
+//        }
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right, android.R.anim.fade_in, android.R.anim.fade_out)
-                .add(R.id.ly_play_list, fragment, LEFT_FRAGMENT_TAG);
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+                .replace(R.id.ly_play_list, fragment, LEFT_FRAGMENT_TAG);
         transaction.addToBackStack(name);
         transaction.commit();
 //        else {
