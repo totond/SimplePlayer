@@ -56,10 +56,12 @@ public class ShowListAdapter extends RecyclerView.Adapter{
     //全选
     public void selectAllItems(){
         //让数组启动初始化
-        setItemChecked(getItemCount() - 1, mSelectedPositions.get(getItemCount() - 1));
+        if (getItemCount() > 0) {
+            setItemChecked(getItemCount() - 1, mSelectedPositions.get(getItemCount() - 1));
 
-        for (int i = 0; i < mSelectedPositions.size(); i++){
-            setItemChecked(i,true);
+            for (int i = 0; i < mSelectedPositions.size(); i++) {
+                setItemChecked(i, true);
+            }
         }
     }
 

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -23,11 +24,13 @@ import java.util.List;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnPermissionDenied;
 import permissions.dispatcher.RuntimePermissions;
+import yanzhikai.simpleplayer.MainActivity;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.adapter.BaseOnItemClickListener;
 import yanzhikai.simpleplayer.adapter.LocalAudioListAdapter;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;
 import yanzhikai.simpleplayer.event.AudioItemAddEvent;
+import yanzhikai.simpleplayer.event.ListSizeChangedEvent;
 import yanzhikai.simpleplayer.event.LocalListChangedEvent;
 import yanzhikai.simpleplayer.event.PlayListChangedEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
@@ -50,6 +53,7 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
     private TextView tv_edit, tv_delete, tv_add, tv_search, tv_choose_all;
     private ProgressBar pb_search;
     private boolean mIsSearching = false;
+    private ImageView iv_back;
 
     public LocalAudioListFragment() {
     }
@@ -72,12 +76,14 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
         tv_search = rootView.findViewById(R.id.tv_search);
         tv_choose_all = rootView.findViewById(R.id.tv_choose_all);
         pb_search = rootView.findViewById(R.id.pb_search);
+        iv_back = rootView.findViewById(R.id.iv_back);
 
         tv_edit.setOnClickListener(this);
         tv_delete.setOnClickListener(this);
         tv_add.setOnClickListener(this);
         tv_search.setOnClickListener(this);
         tv_choose_all.setOnClickListener(this);
+        iv_back.setOnClickListener(this);
 
         rv_local_list = rootView.findViewById(R.id.rv_local_list);
         rv_local_list.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -97,6 +103,7 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
         switch (localListChangedEvent.getType()) {
             case LocalListChangedEvent.SEARCH_FINISH:
                 mIsSearching = false;
+                Log.d(TAG, "SEARCH_FINISH: " + mIsSearching);
                 updateSearching();
                 mLocalAudioListAdapter.setAudioInfos(AudioListDaoManager.getInstance().getLocalListInfo().getRefreshList());
                 mLocalAudioListAdapter.notifyDataSetChanged();
@@ -106,10 +113,12 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
                 mLocalAudioListAdapter.notifyDataSetChanged();
                 rv_local_list.smoothScrollToPosition(AudioListDaoManager.getInstance().getLocalListInfo().getInfoList().size() - 1);
                 break;
-            case LocalListChangedEvent.ANIMATION_FINISH:
-                mLocalAudioListAdapter.notifyDataSetChanged();
-                break;
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleSizeChanged(ListSizeChangedEvent listSizeChangedEvent){
+        mLocalAudioListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -143,6 +152,10 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
             case R.id.tv_choose_all:
                 mLocalAudioListAdapter.selectAllItems();
                 mLocalAudioListAdapter.notifyDataSetChanged();
+                break;
+            case R.id.iv_back:
+                MainActivity mainActivity = (MainActivity)getActivity();
+                mainActivity.openOrCloseRightFragment();
                 break;
         }
     }
@@ -194,10 +207,16 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
     void search() {
         mIsSearching = !mIsSearching;
         updateSearching();
-        searchAudio();
+        if (mIsSearching) {
+            MediaUtil.stopScanning = false;
+            searchAudio();
+        }else {
+            MediaUtil.stopScanning = true;
+        }
     }
 
     private void searchAudio() {
+        Log.d(TAG, "searchAudio: " + mIsSearching);
         new Thread() {
             @Override
             public void run() {
@@ -206,14 +225,11 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
                         .listAvaliableStorage(getActivity().getApplicationContext());
                 for (int i = 0; i < list.size(); i++) {
                     StorageInfo storageInfo = list.get(i);
-                    if (!mIsSearching) {
-                        break;
-                    }
                     MediaUtil.scanLocalAudioFile(storageInfo.path, new MediaUtil.ForeachListener() {
                         @Override
                         public void foreach(AudioInfo audioInfo) {
                             if (AudioListDaoManager.getInstance().insertAudioToList(audioInfo, AudioListDaoManager.getInstance().getLocalListInfo())) {
-                                Log.d(TAG, "foreach: 加入");
+                                Log.d(TAG, "foreach: " + mIsSearching);
                             }
                         }
 
@@ -236,7 +252,7 @@ public class LocalAudioListFragment extends Fragment implements View.OnClickList
 
     @OnPermissionDenied({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
     void onDenied() {
-
+        ToastUtil.makeShortToast(getContext(),"没有存储权限，不能搜索歌曲");
     }
 
     private class MyLocalListItemOnClickListener implements BaseOnItemClickListener {

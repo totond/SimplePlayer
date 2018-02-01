@@ -2,4 +2,11 @@
 <resources>
     <dimen name="play_list_padding">2dp</dimen>
     <dimen name="audio_list_show_padding">10dp</dimen>
+    <dimen name="list_title_margin">45dp</dimen>
+
+    <dimen name="back_btn_width">35dp</dimen>
+    <dimen name="back_btn_height">35dp</dimen>
+    <dimen name="back_btn_margin">5dp</dimen>
+
+    <dimen name="list_bar_height">60dp</dimen>
 </resources>

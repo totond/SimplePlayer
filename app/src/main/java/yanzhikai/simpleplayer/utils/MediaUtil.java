@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
 
 import yanzhikai.simpleplayer.audio.AudioFileReader;
@@ -33,6 +34,8 @@ public class MediaUtil {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
+    public static boolean stopScanning = false;
+
 
     /**
      * 获取音频文件Cursor，过滤小于1分钟的音频文件
@@ -54,7 +57,7 @@ public class MediaUtil {
      * @param activity
      * @param foreachListener
      */
-    public static void scanLocalMusic(Activity activity, ForeachListener foreachListener) {
+    public static void scanLocalMusic(Activity activity, ForeachListener foreachListener,boolean isStop) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (permission != PackageManager.PERMISSION_GRANTED) {
@@ -84,13 +87,16 @@ public class MediaUtil {
         File[] files = new File(path).listFiles();
         if (files != null && files.length > 0) {
             for (int i = 0; i < files.length; i++) {
+                if (stopScanning){
+                    return;
+                }
                 File temp = files[i];
                 if (temp.isFile()) {
 
                     String fileName = temp.getName();
                     String fileExt = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length()).toLowerCase();
                     String filterFormats = "ape,flac,mp3,wav";
-                    if (filterFormats.indexOf(fileExt) == -1) {
+                    if (!filterFormats.contains(fileExt)) {
                         continue;
                     }
 

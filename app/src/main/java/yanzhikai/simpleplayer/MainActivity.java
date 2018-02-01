@@ -28,6 +28,7 @@ import yanzhikai.simpleplayer.event.AudioItemAddEvent;
 import yanzhikai.simpleplayer.event.AudioListChangedEvent;
 import yanzhikai.simpleplayer.event.AudioStartPauseEvent;
 import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
+import yanzhikai.simpleplayer.event.ListSizeChangedEvent;
 import yanzhikai.simpleplayer.event.LocalListChangedEvent;
 import yanzhikai.simpleplayer.event.OpenAudioListEvent;
 import yanzhikai.simpleplayer.event.PlayListChangedEvent;
@@ -52,14 +53,16 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private static final String AUDIO_LIST_FRAGMENT_NAME = "AudioList";
     private static final String LEFT_FRAGMENT_TAG = "LeftFragment";
     private static final String RIGHT_FRAGMENT_TAG = "RightFragment";
+    private static final int TIME_ANIMATION = 500;
     private ImageView btn_pre, btn_play_pause, btn_next;
     private Button btn_choose;
     private SeekBar sb_progress;
     private boolean canUpdate = true;
+
     //    private RecyclerView rv_play_list;
 //    private PlayListAdapter mPlayListAdapter;
-    private LinearLayout ly_play_list;
-    private RelativeLayout ly_sub_list;
+    private LinearLayout ly_left_list;
+    private RelativeLayout ly_right_list;
     private int screenWidth, screenHeight, playListWidth, subListWidth;
 
     private ViewGroup ly_local_btn, ly_audios_btn, ly_timer_btn;
@@ -90,8 +93,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         btn_next = findViewById(R.id.btn_next);
         btn_choose = findViewById(R.id.btn_choose);
         sb_progress = findViewById(R.id.sb_progress);
-        ly_play_list = findViewById(R.id.ly_play_list);
-        ly_sub_list = findViewById(R.id.ly_sub_list);
+        ly_left_list = findViewById(R.id.ly_left_list);
+        ly_right_list = findViewById(R.id.ly_right_list);
 
         ly_local_btn = findViewById(R.id.ly_local_btn);
         ly_audios_btn = findViewById(R.id.ly_audios_btn);
@@ -123,47 +126,92 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         screenWidth = ScreenUtils.getScreenWidth(this);
         screenHeight = ScreenUtils.getScreenHeight(this);
         //要求ly_play_list和ly_sub_list的宽度是具体值
-        playListWidth = ly_play_list.getLayoutParams().width;
-        subListWidth = ly_sub_list.getLayoutParams().width;
+        playListWidth = ly_left_list.getLayoutParams().width;
+        subListWidth = ly_right_list.getLayoutParams().width;
         Log.d(TAG, "playListWidth: " + playListWidth);
         Log.d(TAG, "screenWidth: " + screenWidth);
     }
 
-    private void openOrCloseRightFragment() {
+    public void openOrCloseRightFragment() {
         Log.d(TAG, "playListWidth: " + playListWidth);
         Log.d(TAG, "screenWidth: " + screenWidth);
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) ly_play_list.getLayoutParams();
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) ly_left_list.getLayoutParams();
         ValueAnimator valueAnimator;
         if (layoutParams.width > screenWidth / 2) {
-            valueAnimator = ValueAnimator.ofInt(playListWidth, screenWidth / 2);
-            loadRightFragment(new LocalAudioListFragment());
+            openRight();
         } else {
-            valueAnimator = ValueAnimator.ofInt(screenWidth / 2, playListWidth);
-            removeFragment(RIGHT_FRAGMENT_TAG);
+            closeRight();
         }
+
+    }
+
+    private void closeRight(){
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(screenWidth / 2, playListWidth);
+        removeFragment(RIGHT_FRAGMENT_TAG);
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) ly_play_list.getLayoutParams();
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) ly_left_list.getLayoutParams();
                 layoutParams.width = (int) animation.getAnimatedValue();
-                ly_play_list.setLayoutParams(layoutParams);
+                ly_left_list.setLayoutParams(layoutParams);
 
-                RelativeLayout.LayoutParams subLayoutParams = (RelativeLayout.LayoutParams) ly_sub_list.getLayoutParams();
+                RelativeLayout.LayoutParams subLayoutParams = (RelativeLayout.LayoutParams) ly_right_list.getLayoutParams();
                 subLayoutParams.width = screenWidth - (int) animation.getAnimatedValue();
-                ly_sub_list.setLayoutParams(subLayoutParams);
+                ly_right_list.setLayoutParams(subLayoutParams);
 
             }
         });
         valueAnimator.addListener(new BaseAnimatorListener() {
             @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                ly_audios_btn.setVisibility(View.VISIBLE);
+                ly_local_btn.setVisibility(View.VISIBLE);
+                ly_timer_btn.setVisibility(View.VISIBLE);
+            }
+
+            @Override
             public void onAnimationEnd(Animator animation) {
-                EventUtil.post(new LocalListChangedEvent(LocalListChangedEvent.ANIMATION_FINISH));
+                EventUtil.post(new ListSizeChangedEvent());
             }
         });
-        valueAnimator.setDuration(500);
+        valueAnimator.setDuration(TIME_ANIMATION);
         valueAnimator.start();
     }
 
+    private void openRight(){
+        ValueAnimator valueAnimator = ValueAnimator.ofInt(playListWidth, screenWidth / 2);
+        loadRightFragment(new LocalAudioListFragment());
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) ly_left_list.getLayoutParams();
+                layoutParams.width = (int) animation.getAnimatedValue();
+                ly_left_list.setLayoutParams(layoutParams);
+
+                RelativeLayout.LayoutParams subLayoutParams = (RelativeLayout.LayoutParams) ly_right_list.getLayoutParams();
+                subLayoutParams.width = screenWidth - (int) animation.getAnimatedValue();
+                ly_right_list.setLayoutParams(subLayoutParams);
+
+            }
+        });
+        valueAnimator.addListener(new BaseAnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                ly_audios_btn.setVisibility(View.INVISIBLE);
+                ly_local_btn.setVisibility(View.INVISIBLE);
+                ly_timer_btn.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                EventUtil.post(new ListSizeChangedEvent());
+            }
+        });
+        valueAnimator.setDuration(TIME_ANIMATION);
+        valueAnimator.start();
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleUpdate(CurrentAudioDetailEvent event) {
@@ -339,8 +387,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(R.id.ly_sub_list, fragment, RIGHT_FRAGMENT_TAG);
+                .setCustomAnimations(R.anim.silde_from_right, R.anim.silde_to_right, R.anim.silde_from_right, R.anim.silde_to_right)
+                .replace(R.id.ly_right_list, fragment, RIGHT_FRAGMENT_TAG);
 //            transaction.addToBackStack(PLAY_LIST_FRAGMENT_NAME);
         transaction.commit();
 //            getSupportFragmentManager().popBackStack(LOCAL_AUDIO_LIST_FRAGMENT_TAG, 0);
@@ -355,7 +403,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-    private void popFragment() {
+    public void popFragment() {
 
         if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
             Log.d(TAG, "popFragment: 0");
@@ -370,8 +418,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(R.id.ly_play_list, fragment, LEFT_FRAGMENT_TAG);
+                .setCustomAnimations(android.R.anim.slide_in_left, android.R.anim.slide_out_right, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
+                .replace(R.id.ly_left_list, fragment, LEFT_FRAGMENT_TAG);
 //            transaction.addToBackStack(PLAY_LIST_FRAGMENT_NAME);
         transaction.commit();
 //        else {
@@ -386,8 +434,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 //        }
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(R.id.ly_play_list, fragment, LEFT_FRAGMENT_TAG);
+                .setCustomAnimations(R.anim.silde_from_right,R.anim.slide_to_left, R.anim.silde_from_right,R.anim.slide_to_left)
+                .replace(R.id.ly_left_list, fragment, LEFT_FRAGMENT_TAG);
         transaction.addToBackStack(name);
         transaction.commit();
 //        else {

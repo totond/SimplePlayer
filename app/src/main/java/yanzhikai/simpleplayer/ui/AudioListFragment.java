@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -19,12 +20,14 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
+import yanzhikai.simpleplayer.MainActivity;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.adapter.AudioListAdapter;
 import yanzhikai.simpleplayer.adapter.PlayListAdapter;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;
 import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.event.AudioListChangedEvent;
+import yanzhikai.simpleplayer.event.ListSizeChangedEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.utils.EventUtil;
@@ -42,6 +45,7 @@ public class AudioListFragment extends Fragment implements View.OnClickListener 
     private AudioListAdapter mAudioListAdapter;
     private TextView tv_edit,tv_delete,tv_choose_all,tv_audio_list_title,tv_cover;
     private String listName;
+    private ImageView iv_back;
 
 
     public AudioListFragment() {
@@ -93,11 +97,13 @@ public class AudioListFragment extends Fragment implements View.OnClickListener 
         tv_delete = rootView.findViewById(R.id.tv_delete);
         tv_choose_all = rootView.findViewById(R.id.tv_choose_all);
         tv_cover = rootView.findViewById(R.id.tv_cover);
+        iv_back = rootView.findViewById(R.id.iv_back);
 
         tv_edit.setOnClickListener(this);
         tv_delete.setOnClickListener(this);
         tv_choose_all.setOnClickListener(this);
         tv_cover.setOnClickListener(this);
+        iv_back.setOnClickListener(this);
 
         tv_audio_list_title.setText(listName);
 
@@ -113,6 +119,11 @@ public class AudioListFragment extends Fragment implements View.OnClickListener 
                 mAudioListAdapter.notifyDataSetChanged();
                 break;
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleSizeChanged(ListSizeChangedEvent listSizeChangedEvent){
+        mAudioListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -133,13 +144,13 @@ public class AudioListFragment extends Fragment implements View.OnClickListener 
                 break;
             case R.id.tv_delete:
                 ArrayList<AudioInfo> deleteList = mAudioListAdapter.getSelectedItem();
-                boolean flag = true;
                 for (AudioInfo audioInfo : deleteList) {
-                    flag &= PlayList.getInstance().remove(audioInfo);
+                    AudioListDaoManager.getInstance().deleteAudioInList(audioInfo,listName);
                 }
                 mAudioListAdapter.clearSelected();
+                mAudioListAdapter.setAudioInfos(AudioListDaoManager.getInstance().queryAudioListByName(listName).getRefreshList());
                 mAudioListAdapter.notifyDataSetChanged();
-                ToastUtil.makeShortToast(getContext(),"删除了"+deleteList.size() + "首歌" + flag);
+                ToastUtil.makeShortToast(getContext(),"删除了"+deleteList.size() + "首歌");
                 break;
             case R.id.tv_choose_all:
                 mAudioListAdapter.selectAllItems();
@@ -152,6 +163,10 @@ public class AudioListFragment extends Fragment implements View.OnClickListener 
                 for (int i = fragmentManager.getBackStackEntryCount(); i > 0 ; i--){
                     fragmentManager.popBackStack();
                 }
+                break;
+            case R.id.iv_back:
+                MainActivity mainActivity = (MainActivity)getActivity();
+                mainActivity.popFragment();
                 break;
         }
     }

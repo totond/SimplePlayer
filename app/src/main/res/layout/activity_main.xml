@@ -67,7 +67,7 @@
     <LinearLayout
         android:layout_width="1000dp"
         android:layout_height="match_parent"
-        android:id="@+id/ly_play_list"
+        android:id="@+id/ly_left_list"
         android:orientation="vertical"
         android:layout_above="@+id/sb_progress"
         android:layout_marginBottom="10dp"
@@ -78,7 +78,7 @@
     <RelativeLayout
         android:layout_width="300dp"
         android:layout_height="match_parent"
-        android:id="@+id/ly_sub_list"
+        android:id="@+id/ly_right_list"
         android:background="@drawable/shadow_play_list"
         android:layout_alignParentEnd="true"
         android:layout_above="@+id/sb_progress"
@@ -86,7 +86,7 @@
         >
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ly_local_btn"
             android:orientation="vertical"
@@ -98,18 +98,20 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:src="@mipmap/local_audios"
+                android:layout_gravity="center_horizontal"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/btn_local_list"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
                 style="@style/MainButtonText"
                 />
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ly_audios_btn"
             android:layout_below="@+id/ly_local_btn"
@@ -121,6 +123,7 @@
             <ImageView
                 android:layout_width="100dp"
                 android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
                 android:src="@mipmap/audio_lists"
                 />
             <TextView
@@ -128,12 +131,13 @@
                 android:layout_height="wrap_content"
                 android:text="@string/btn_audio_list"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
                 style="@style/MainButtonText"
                 />
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/ly_timer_btn"
             android:layout_below="@+id/ly_audios_btn"
@@ -146,12 +150,14 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:src="@mipmap/timer"
+                android:layout_gravity="center_horizontal"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/btn_timer"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
                 style="@style/MainButtonText"
                 />
         </LinearLayout>

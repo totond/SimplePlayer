@@ -304,13 +304,15 @@ public class AudioListDaoManager {
         return getDaoSession().getJoinListWithAudioDao().load(md5);
     }
 
-    public void deleteAudioInList(AudioInfo audioInfo, String listName){
+    public boolean deleteAudioInList(AudioInfo audioInfo, String listName){
         String  md5 = MD5Util.encryptMD5ToString(audioInfo.getAudioHash() + listName);
         JoinListWithAudio joinListWithAudio = queryJoin(md5);
         if (joinListWithAudio != null) {
             getDaoSession().getJoinListWithAudioDao().delete(joinListWithAudio);
+            return true;
         }else {
             Log.w(TAG, "deleteAudioInList: failed, can not found!" );
+            return false;
         }
     }
 

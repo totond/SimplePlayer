@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -24,6 +25,7 @@ import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.adapter.BaseOnItemClickListener;
 import yanzhikai.simpleplayer.adapter.PlayListAdapter;
 import yanzhikai.simpleplayer.event.AudioEvent;
+import yanzhikai.simpleplayer.event.ListSizeChangedEvent;
 import yanzhikai.simpleplayer.event.PlayListChangedEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.PlayList;
@@ -39,6 +41,7 @@ public class PlayListFragment extends Fragment implements View.OnClickListener{
     private RecyclerView rv_play_list;
     private PlayListAdapter mPlayListAdapter;
     private TextView tv_edit,tv_delete,tv_choose_all;
+
 
     public PlayListFragment() {
     }
@@ -140,6 +143,11 @@ public class PlayListFragment extends Fragment implements View.OnClickListener{
                 rv_play_list.smoothScrollToPosition(mPlayListAdapter.getItemCount() - 1);
                 break;
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleSizeChanged(ListSizeChangedEvent listSizeChangedEvent){
+        mPlayListAdapter.notifyDataSetChanged();
     }
 
     @Override

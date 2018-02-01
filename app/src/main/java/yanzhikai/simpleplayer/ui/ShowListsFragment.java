@@ -1,6 +1,7 @@
 package yanzhikai.simpleplayer.ui;
 
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,14 +14,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
+import yanzhikai.simpleplayer.MainActivity;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.adapter.BaseOnItemClickListener;
 import yanzhikai.simpleplayer.adapter.ShowListAdapter;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;
+import yanzhikai.simpleplayer.event.ListSizeChangedEvent;
 import yanzhikai.simpleplayer.event.OpenAudioListEvent;
 import yanzhikai.simpleplayer.model.AudioListInfo;
 import yanzhikai.simpleplayer.utils.EventUtil;
@@ -35,22 +42,30 @@ public class ShowListsFragment extends Fragment implements View.OnClickListener 
     private RecyclerView rv_show_list;
     private ShowListAdapter mShowListAdapter;
     private TextView tv_delete, tv_new;
-
+    private ImageView iv_back;
 
     public ShowListsFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventUtil.unregister(this);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        EventUtil.register(this);
         View rootView = inflater.inflate(R.layout.fragment_show_lists, container, false);
         tv_new = rootView.findViewById(R.id.tv_new);
         tv_delete = rootView.findViewById(R.id.tv_delete);
+        iv_back = rootView.findViewById(R.id.iv_back);
 
         tv_new.setOnClickListener(this);
         tv_delete.setOnClickListener(this);
+        iv_back.setOnClickListener(this);
 
         rv_show_list = rootView.findViewById(R.id.rv_show_list);
         rv_show_list.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -86,7 +101,16 @@ public class ShowListsFragment extends Fragment implements View.OnClickListener 
                 }
                 mShowListAdapter.notifyDataSetChanged();
                 break;
+            case R.id.iv_back:
+                MainActivity mainActivity = (MainActivity)getActivity();
+                mainActivity.popFragment();
+                break;
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleSizeChanged(ListSizeChangedEvent listSizeChangedEvent){
+        mShowListAdapter.notifyDataSetChanged();
     }
 
     //弹出输入框Dialog

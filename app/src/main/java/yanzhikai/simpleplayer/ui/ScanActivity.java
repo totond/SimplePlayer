@@ -79,7 +79,7 @@ public class ScanActivity extends Activity {
                     public boolean filter(String hash) {
                         return isExist(hash);
                     }
-                });
+                },false);
                 mHandler.sendEmptyMessage(FINISH);
             }
         }.start();

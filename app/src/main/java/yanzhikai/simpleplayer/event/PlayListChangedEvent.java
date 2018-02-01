@@ -12,7 +12,6 @@ import android.util.Log;
 public class PlayListChangedEvent {
     public static final int CURRENT_AUDIO_CHANGED = 0;
     public static final int ITEM_ADDED = 1;
-
     private int mType = CURRENT_AUDIO_CHANGED;
 
     public PlayListChangedEvent(int type){
