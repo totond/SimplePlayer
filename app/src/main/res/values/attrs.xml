@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ClockItemLayout">
+        <attr name="itemName" format="string"/>
+        <attr name="showSwitch" format="boolean"/>
+    </declare-styleable>
+</resources>

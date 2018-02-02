@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    >
+
+    <TextView
+        android:id="@+id/tv_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/audio_list_show_padding"
+        android:layout_marginTop="8dp"
+        android:layout_centerVertical="true"
+        style="@style/AlarmItemNameText"
+        android:text="未知"
+        />
+
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_content"
+        android:layout_marginEnd="@dimen/audio_list_show_padding"
+        style="@style/AlarmItemContentText"
+        android:layout_toStartOf="@id/iv_enter"
+        android:layout_centerVertical="true"
+        />
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:id="@+id/iv_enter"
+        android:src="@mipmap/right"
+        android:scaleType="fitXY"
+        android:layout_marginEnd="@dimen/audio_list_show_padding"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        />
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sw"
+        android:switchMinWidth="60dp"
+        android:visibility="gone"
+        android:layout_marginEnd="@dimen/audio_list_show_padding"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        />
+
+</merge>

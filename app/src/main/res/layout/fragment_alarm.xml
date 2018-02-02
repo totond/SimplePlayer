@@ -1,0 +1,109 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context="yanzhikai.simpleplayer.ui.AlarmFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:background="@drawable/background_play_list_bar"
+        >
+
+        <ImageView
+            android:layout_width="@dimen/back_btn_width"
+            android:layout_height="@dimen/back_btn_height"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/back_left"
+            android:layout_marginStart="@dimen/back_btn_margin"
+            android:background="@drawable/background_btn"
+            android:id="@+id/iv_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_show_list_title"
+            android:text="@string/alarm_list_title"
+            android:layout_margin="@dimen/list_title_margin"
+            style="@style/AudioListTitleText"
+            android:layout_centerVertical="true"
+            />
+
+    </RelativeLayout>
+
+    <yanzhikai.simpleplayer.ui.ClockItemLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:id="@+id/cl_play_switch"
+        app:itemName="@string/alarm_list_play"
+        app:showSwitch="true"
+        android:background="@drawable/background_play_list_item"
+        >
+    </yanzhikai.simpleplayer.ui.ClockItemLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorBlack"
+        />
+
+    <yanzhikai.simpleplayer.ui.ClockItemLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:id="@+id/cl_play_time"
+        app:itemName="@string/alarm_list_time"
+        app:showSwitch="false"
+        android:background="@drawable/background_play_list_item"
+        >
+    </yanzhikai.simpleplayer.ui.ClockItemLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorBlack"
+        />
+    <yanzhikai.simpleplayer.ui.ClockItemLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:id="@+id/cl_play_date"
+        app:itemName="@string/alarm_list_date"
+        app:showSwitch="false"
+        android:background="@drawable/background_play_list_item"
+        >
+    </yanzhikai.simpleplayer.ui.ClockItemLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorBlack"
+        />
+
+    <yanzhikai.simpleplayer.ui.ClockItemLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:id="@+id/cl_play_audios"
+        app:itemName="@string/alarm_list_audios"
+        app:showSwitch="false"
+        android:background="@drawable/background_play_list_item"
+        >
+    </yanzhikai.simpleplayer.ui.ClockItemLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorBlack"
+        />
+    <yanzhikai.simpleplayer.ui.ClockItemLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:id="@+id/cl_stop_switch"
+        app:itemName="@string/alarm_list_stop"
+        app:showSwitch="true"
+        android:background="@drawable/background_play_list_item"
+        >
+    </yanzhikai.simpleplayer.ui.ClockItemLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorBlack"
+        />
+
+</LinearLayout>

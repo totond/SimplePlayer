@@ -41,6 +41,11 @@
     <string name="local_list_choose_all">全选</string>
 
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="alarm_list_title">定时功能</string>
+    <string name="alarm_list_play">定时播放</string>
+    <string name="alarm_list_time">播放时间</string>
+    <string name="alarm_list_date">播放日期</string>
+    <string name="alarm_list_audios">播放歌单</string>
+    <string name="alarm_list_stop">定时停止</string>
+
 </resources>

@@ -36,6 +36,7 @@ import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.AudioListInfo;
 import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.service.AudioPlayerService;
+import yanzhikai.simpleplayer.ui.AlarmFragment;
 import yanzhikai.simpleplayer.ui.AudioListFragment;
 import yanzhikai.simpleplayer.ui.LocalAudioListFragment;
 import yanzhikai.simpleplayer.ui.PlayListFragment;
@@ -51,6 +52,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private static final String PLAY_LIST_FRAGMENT_NAME = "PlayList";
     private static final String SHOW_LIST_FRAGMENT_NAME = "ShowList";
     private static final String AUDIO_LIST_FRAGMENT_NAME = "AudioList";
+    private static final String ALARM_FRAGMENT_NAME = "Alarm";
     private static final String LEFT_FRAGMENT_TAG = "LeftFragment";
     private static final String RIGHT_FRAGMENT_TAG = "RightFragment";
     private static final int TIME_ANIMATION = 500;
@@ -329,7 +331,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 loadLeftFragmentWithStack(new ShowListsFragment(), SHOW_LIST_FRAGMENT_NAME);
                 break;
             case R.id.ly_timer_btn:
-
+                loadLeftFragmentWithStack(AlarmFragment.newInstance(),ALARM_FRAGMENT_NAME);
                 break;
         }
     }

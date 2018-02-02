@@ -43,6 +43,16 @@
     <style name="AudioControlBarButton">
         <item name="android:scaleType">fitXY</item>
         <item name="android:background">@drawable/background_btn</item>
+    </style>
+    
+    <style name="AlarmItemNameText">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@drawable/background_alarm_text</item>
+    </style>
 
+    <style name="AlarmItemContentText">
+        <item name="android:textSize">18sp</item>
+        <item name="android:enabled">true</item>
+        <item name="android:textColor">@drawable/background_alarm_text</item>
     </style>
 </resources>
