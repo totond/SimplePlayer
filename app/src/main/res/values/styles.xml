@@ -47,12 +47,13 @@
     
     <style name="AlarmItemNameText">
         <item name="android:textSize">22sp</item>
-        <item name="android:textColor">@drawable/background_alarm_text</item>
+        <item name="android:enabled">true</item>
+        <item name="android:textColor">@color/colorBlack</item>
     </style>
 
     <style name="AlarmItemContentText">
         <item name="android:textSize">18sp</item>
         <item name="android:enabled">true</item>
-        <item name="android:textColor">@drawable/background_alarm_text</item>
+        <item name="android:textColor">@color/colorBlack</item>
     </style>
 </resources>

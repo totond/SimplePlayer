@@ -8,7 +8,6 @@ import com.jian.greendao.gen.AudioInfoDao;
 import com.jian.greendao.gen.AudioListInfoDao;
 import com.jian.greendao.gen.DaoMaster;
 import com.jian.greendao.gen.DaoSession;
-import com.jian.greendao.gen.JoinListWithAudioDao;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
@@ -17,6 +16,7 @@ import java.util.List;
 
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.AudioListInfo;
+import yanzhikai.simpleplayer.model.AlarmInfo;
 import yanzhikai.simpleplayer.model.JoinListWithAudio;
 import yanzhikai.simpleplayer.utils.MD5Util;
 
@@ -31,6 +31,8 @@ public class AudioListDaoManager {
     public static final String TAG = "yjkAudioListDaoManager";
     private static final String DB_NAME = "AudioList";
     public static final String LOCAL_LIST_NAME = "_LocalList";
+    public static final String ALARM_CLOCK_NAME = "_AlarmClock";
+
     private volatile static AudioListDaoManager mManager = new AudioListDaoManager();
     private static DaoMaster sDaoMaster;
     private static DaoMaster.DevOpenHelper sHelper;
@@ -48,6 +50,7 @@ public class AudioListDaoManager {
     public void init(Context context) {
         mContext = context;
         initLocalAudioList();
+        initAlarm();
     }
 
 
@@ -80,6 +83,13 @@ public class AudioListDaoManager {
         Log.d(TAG, "initLocalAudioList: size: " + queryAudioListByName(LOCAL_LIST_NAME).getInfoList().size());
         mLocalListInfo = queryAudioListByName(LOCAL_LIST_NAME);
         Log.d(TAG, "initLocalAudioList: get:" + mLocalListInfo.getInfoList().size());
+    }
+
+    private void initAlarm(){
+        if (getDaoSession().getAlarmInfoDao().load(ALARM_CLOCK_NAME) == null){
+            AlarmInfo alarmInfo = new AlarmInfo(ALARM_CLOCK_NAME,"08:00",AlarmInfo.ONCE,"播放列表",false);
+            getDaoSession().getAlarmInfoDao().insert(alarmInfo);
+        }
     }
 
     /**
@@ -248,12 +258,13 @@ public class AudioListDaoManager {
     }
 
     public boolean isAudioListExist(String name) {
-        QueryBuilder<AudioListInfo> queryBuilder = getDaoSession().queryBuilder(AudioListInfo.class);
-        if (queryBuilder.where(AudioListInfoDao.Properties.ListName.eq(name)).list().size() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+//        QueryBuilder<AudioListInfo> queryBuilder = getDaoSession().queryBuilder(AudioListInfo.class);
+//        if (queryBuilder.where(AudioListInfoDao.Properties.ListName.eq(name)).list().size() > 0) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+        return  (getDaoSession().getAudioListInfoDao().load(name) != null);
     }
 
 
@@ -362,49 +373,24 @@ public class AudioListDaoManager {
         }
     }
 
-    /**
-     * 修改一条数据
-     *
-     * @param audioInfo
-     * @return
-     */
-    public boolean updateAudio(AudioInfo audioInfo) {
-        boolean flag = false;
-        try {
-            getDaoSession().update(audioInfo);
-            flag = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return flag;
-    }
+
 
 
     /**
-     * 删除所有记录
-     *
-     * @return
-     */
-    public void deleteAllLocalAudio() {
-        try {
-            mLocalListInfo.getInfoList().clear();
-            mLocalListInfo.update();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 查询所有记录
-     *
+     * 查询所有本地音乐
      * @return
      */
     public List<AudioInfo> queryAllLocalAudio() {
         return getLocalListInfo().getInfoList();
     }
 
+    public AlarmInfo queryAlarmInfo(){
+        return getDaoSession().getAlarmInfoDao().load(ALARM_CLOCK_NAME);
+    }
 
-//    public boolean isExistInLocalList(String hash){
-//        return getLocalListInfo().isExist(hash);
-//    }
+    public void updateAlarm(AlarmInfo alarmInfo){
+        alarmInfo.setName(ALARM_CLOCK_NAME);
+        getDaoSession().getAlarmInfoDao().update(alarmInfo);
+    }
+
 }

@@ -51,4 +51,6 @@ dependencies {
         exclude module: "support-v13"
     }
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.0.1'
+
+    compile 'com.contrarywind:Android-PickerView:3.2.7'
 }

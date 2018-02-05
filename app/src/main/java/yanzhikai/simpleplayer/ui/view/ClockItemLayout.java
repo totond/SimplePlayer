@@ -1,4 +1,4 @@
-package yanzhikai.simpleplayer.ui;
+package yanzhikai.simpleplayer.ui.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -19,6 +19,7 @@ import yanzhikai.simpleplayer.R;
  */
 
 public class ClockItemLayout extends RelativeLayout {
+    private Context mContext;
     private TextView tv_item_name, tv_content;
     private ImageView iv_enter;
     private Switch sw;
@@ -41,6 +42,7 @@ public class ClockItemLayout extends RelativeLayout {
     }
 
     private void initAttrs(Context context, AttributeSet attrs) {
+        mContext = context;
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ClockItemLayout);
         setItemName(typedArray.getString(R.styleable.ClockItemLayout_itemName));
         setSwitchShow(typedArray.getBoolean(R.styleable.ClockItemLayout_showSwitch, false));
@@ -65,8 +67,8 @@ public class ClockItemLayout extends RelativeLayout {
         }
     }
 
-    public boolean getSwitch(){
-        return sw.isChecked();
+    public Switch getSwitch(){
+        return sw;
     }
 
     public void setSwitch(boolean open) {
@@ -82,11 +84,14 @@ public class ClockItemLayout extends RelativeLayout {
     }
 
     public void setItemEnable(boolean enable) {
-        tv_item_name.setEnabled(enable);
-        tv_content.setEnabled(enable);
+        setEnabled(enable);
         if (enable) {
+            tv_item_name.setTextColor(mContext.getResources().getColor(R.color.colorBlack));
+            tv_content.setTextColor(mContext.getResources().getColor(R.color.colorBlack));
             iv_enter.setImageResource(R.mipmap.right);
         } else {
+            tv_item_name.setTextColor(mContext.getResources().getColor(R.color.colorLightGrey));
+            tv_content.setTextColor(mContext.getResources().getColor(R.color.colorLightGrey));
             iv_enter.setImageResource(R.mipmap.right_disable);
         }
     }

@@ -33,7 +33,7 @@
 
     </RelativeLayout>
 
-    <yanzhikai.simpleplayer.ui.ClockItemLayout
+    <yanzhikai.simpleplayer.ui.view.ClockItemLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:id="@+id/cl_play_switch"
@@ -41,14 +41,14 @@
         app:showSwitch="true"
         android:background="@drawable/background_play_list_item"
         >
-    </yanzhikai.simpleplayer.ui.ClockItemLayout>
+    </yanzhikai.simpleplayer.ui.view.ClockItemLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorBlack"
+        android:background="@color/colorGrey"
         />
 
-    <yanzhikai.simpleplayer.ui.ClockItemLayout
+    <yanzhikai.simpleplayer.ui.view.ClockItemLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:id="@+id/cl_play_time"
@@ -56,13 +56,13 @@
         app:showSwitch="false"
         android:background="@drawable/background_play_list_item"
         >
-    </yanzhikai.simpleplayer.ui.ClockItemLayout>
+    </yanzhikai.simpleplayer.ui.view.ClockItemLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorBlack"
+        android:background="@color/colorGrey"
         />
-    <yanzhikai.simpleplayer.ui.ClockItemLayout
+    <yanzhikai.simpleplayer.ui.view.ClockItemLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:id="@+id/cl_play_date"
@@ -70,14 +70,14 @@
         app:showSwitch="false"
         android:background="@drawable/background_play_list_item"
         >
-    </yanzhikai.simpleplayer.ui.ClockItemLayout>
+    </yanzhikai.simpleplayer.ui.view.ClockItemLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorBlack"
+        android:background="@color/colorGrey"
         />
 
-    <yanzhikai.simpleplayer.ui.ClockItemLayout
+    <yanzhikai.simpleplayer.ui.view.ClockItemLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:id="@+id/cl_play_audios"
@@ -85,13 +85,13 @@
         app:showSwitch="false"
         android:background="@drawable/background_play_list_item"
         >
-    </yanzhikai.simpleplayer.ui.ClockItemLayout>
+    </yanzhikai.simpleplayer.ui.view.ClockItemLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorBlack"
+        android:background="@color/colorGrey"
         />
-    <yanzhikai.simpleplayer.ui.ClockItemLayout
+    <yanzhikai.simpleplayer.ui.view.ClockItemLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:id="@+id/cl_stop_switch"
@@ -99,11 +99,11 @@
         app:showSwitch="true"
         android:background="@drawable/background_play_list_item"
         >
-    </yanzhikai.simpleplayer.ui.ClockItemLayout>
+    </yanzhikai.simpleplayer.ui.view.ClockItemLayout>
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorBlack"
+        android:background="@color/colorGrey"
         />
 
 </LinearLayout>
