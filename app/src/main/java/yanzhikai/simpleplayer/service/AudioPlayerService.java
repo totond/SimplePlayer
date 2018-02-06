@@ -5,10 +5,12 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.IBinder;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -22,14 +24,21 @@ import yanzhikai.simpleplayer.AudioPlayerListener;
 import yanzhikai.simpleplayer.MainActivity;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.SimpleAudioPlayer;
+import yanzhikai.simpleplayer.db.AudioListDaoManager;
 import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.event.AudioStartPauseEvent;
+import yanzhikai.simpleplayer.event.ClockPlayEvent;
 import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
 import yanzhikai.simpleplayer.event.PlayListChangedEvent;
+import yanzhikai.simpleplayer.event.ShowClockEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
+import yanzhikai.simpleplayer.model.AudioListInfo;
 import yanzhikai.simpleplayer.model.PlayList;
+import yanzhikai.simpleplayer.utils.EventUtil;
 import yanzhikai.simpleplayer.utils.MediaUtil;
 import yanzhikai.simpleplayer.utils.ToastUtil;
+
+import static yanzhikai.simpleplayer.MyApplication.PLAY_LIST_NAME;
 
 public class AudioPlayerService extends Service {
     public static final String TAG = "yjkAudioPlayerService";
@@ -259,6 +268,31 @@ public class AudioPlayerService extends Service {
                 }
 //                }
                 break;
+        }
+    }
+
+    @Subscribe
+    public void handleClockEvent(ClockPlayEvent clockPlayEvent){
+        if (clockPlayEvent.listName.equals(PLAY_LIST_NAME) ){
+            PlayList playList = PlayList.getInstance();
+            if (playList.getAudioList().size() > 0){
+                playList.noMusic();
+                playStart();
+                EventUtil.post(new ShowClockEvent(getString(R.string.clock_msg_ring,clockPlayEvent.listName)));
+            }else {
+                EventUtil.post(new ShowClockEvent(getString(R.string.clock_msg_no_music,clockPlayEvent.listName)));
+            }
+        }else {
+            AudioListInfo audioListInfo = AudioListDaoManager.getInstance().queryAudioListByName(clockPlayEvent.listName);
+            if (audioListInfo.getInfoList().size() > 0){
+                PlayList.getInstance().clear();
+                PlayList.getInstance().add(audioListInfo.getInfoList());
+                playStart();
+                EventUtil.post(new ShowClockEvent(getString(R.string.clock_msg_ring,clockPlayEvent.listName)));
+            }else {
+                EventUtil.post(new ShowClockEvent(getString(R.string.clock_msg_no_music,clockPlayEvent.listName)));
+            }
+
         }
     }
 

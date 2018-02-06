@@ -47,5 +47,10 @@
     <string name="alarm_list_date">重复播放</string>
     <string name="alarm_list_audios">播放歌单</string>
     <string name="alarm_list_stop">定时停止</string>
+    <string name="alarm_save_ask">有未保存的修改，是否保存</string>
+
+    <string name="clock_msg_ring">设定时间已到，现在为您播放歌单：%1$s</string>
+    <string name="clock_msg_no_music">设定时间已到，但是歌单："%1$s" 没有音乐</string>
+
 
 </resources>

@@ -30,6 +30,12 @@
             android:name=".service.AudioPlayerService"
             android:enabled="true"
             android:exported="true"></service>
+
+        <receiver android:name=".receiver.ClockReceiver">
+            <intent-filter>
+                <action android:name="yanzhikai.alarm.clock"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

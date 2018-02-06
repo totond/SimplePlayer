@@ -1,8 +1,18 @@
 package yanzhikai.simpleplayer.model;
 
+import android.content.Context;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
+import yanzhikai.alarmclock.AlarmManagerUtil;
+
+import static yanzhikai.alarmclock.AlarmManagerUtil.ALARM_ACTION;
 
 /**
  * author : yany
@@ -29,8 +39,7 @@ public class AlarmInfo {
     private boolean isOpen;
 
     @Generated(hash = 1649922400)
-    public AlarmInfo(String name, String time, String repeat, String audioList,
-            boolean isOpen) {
+    public AlarmInfo(String name, String time, String repeat, String audioList, boolean isOpen) {
         this.name = name;
         this.time = time;
         this.repeat = repeat;
@@ -40,6 +49,41 @@ public class AlarmInfo {
 
     @Generated(hash = 212221696)
     public AlarmInfo() {
+    }
+
+    public void cancelClock(Context context){
+        AlarmManagerUtil.cancelAlarm(context,ALARM_ACTION,0);
+    }
+
+    public void setClock(Context context){
+        if (!checkClock()){
+            return;
+        }
+
+        String[] times = time.split(":");
+        switch (repeat){
+            case ONCE:
+                AlarmManagerUtil.setAlarm(context, 0, Integer.parseInt(times[0]), Integer.parseInt
+                        (times[1]), 0, 0, "闹钟响了", 1,audioList);
+                break;
+            case EVERY:
+                AlarmManagerUtil.setAlarm(context, 1, Integer.parseInt(times[0]), Integer.parseInt
+                        (times[1]), 0, 0, "闹钟响了", 1,audioList);
+                break;
+        }
+    }
+
+    private boolean checkClock(){
+        if (time == null || time.length() < 0){
+            return false;
+        }
+        if (repeat == null || repeat.length() < 0){
+            return false;
+        }
+        if (audioList == null || audioList.length() < 0){
+            return false;
+        }
+        return isOpen;
     }
 
     public String getName() {
@@ -81,6 +125,7 @@ public class AlarmInfo {
     public void setIsOpen(boolean isOpen) {
         this.isOpen = isOpen;
     }
+
 
 
 }

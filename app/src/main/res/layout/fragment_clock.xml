@@ -31,14 +31,38 @@
             android:layout_centerVertical="true"
             />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_save"
+            android:layout_marginEnd="20dp"
+            android:text="@string/audio_list_edit_completed"
+            android:background="@drawable/background_btn"
+            style="@style/AudioListEditText"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"/>
     </RelativeLayout>
 
     <yanzhikai.simpleplayer.ui.view.ClockItemLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:id="@+id/cl_play_switch"
-        app:itemName="@string/alarm_list_play"
-        app:showSwitch="true"
+        android:id="@+id/cl_play_time"
+        app:itemName="@string/alarm_list_time"
+        app:showSwitch="false"
+        android:background="@drawable/background_play_list_item"
+        >
+    </yanzhikai.simpleplayer.ui.view.ClockItemLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorGrey"
+        />
+    <yanzhikai.simpleplayer.ui.view.ClockItemLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:id="@+id/cl_play_date"
+        app:itemName="@string/alarm_list_date"
+        app:showSwitch="false"
         android:background="@drawable/background_play_list_item"
         >
     </yanzhikai.simpleplayer.ui.view.ClockItemLayout>
@@ -51,9 +75,9 @@
     <yanzhikai.simpleplayer.ui.view.ClockItemLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
-        android:id="@+id/cl_stop_switch"
-        app:itemName="@string/alarm_list_stop"
-        app:showSwitch="true"
+        android:id="@+id/cl_play_audios"
+        app:itemName="@string/alarm_list_audios"
+        app:showSwitch="false"
         android:background="@drawable/background_play_list_item"
         >
     </yanzhikai.simpleplayer.ui.view.ClockItemLayout>

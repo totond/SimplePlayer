@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 import android.util.Log;
 
+import com.jian.greendao.gen.AlarmInfoDao;
 import com.jian.greendao.gen.AudioInfoDao;
 import com.jian.greendao.gen.AudioListInfoDao;
 import com.jian.greendao.gen.DaoMaster;
@@ -31,7 +32,7 @@ public class AudioListDaoManager {
     public static final String TAG = "yjkAudioListDaoManager";
     private static final String DB_NAME = "AudioList";
     public static final String LOCAL_LIST_NAME = "_LocalList";
-    public static final String ALARM_CLOCK_NAME = "_AlarmClock";
+    public static final String ALARM_CLOCK_NAME = "AlarmClock";
 
     private volatile static AudioListDaoManager mManager = new AudioListDaoManager();
     private static DaoMaster sDaoMaster;
@@ -86,7 +87,8 @@ public class AudioListDaoManager {
     }
 
     private void initAlarm(){
-        if (getDaoSession().getAlarmInfoDao().load(ALARM_CLOCK_NAME) == null){
+        QueryBuilder<AlarmInfo> queryBuilder = getDaoSession().queryBuilder(AlarmInfo.class);
+        if (!(queryBuilder.where(AlarmInfoDao.Properties.Name.eq(ALARM_CLOCK_NAME)).list().size() > 0)) {
             AlarmInfo alarmInfo = new AlarmInfo(ALARM_CLOCK_NAME,"08:00",AlarmInfo.ONCE,"播放列表",false);
             getDaoSession().getAlarmInfoDao().insert(alarmInfo);
         }
@@ -258,13 +260,13 @@ public class AudioListDaoManager {
     }
 
     public boolean isAudioListExist(String name) {
-//        QueryBuilder<AudioListInfo> queryBuilder = getDaoSession().queryBuilder(AudioListInfo.class);
-//        if (queryBuilder.where(AudioListInfoDao.Properties.ListName.eq(name)).list().size() > 0) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-        return  (getDaoSession().getAudioListInfoDao().load(name) != null);
+        QueryBuilder<AudioListInfo> queryBuilder = getDaoSession().queryBuilder(AudioListInfo.class);
+        if (queryBuilder.where(AudioListInfoDao.Properties.ListName.eq(name)).list().size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+//        return  (getDaoSession().getAudioListInfoDao().load(name) != null);
     }
 
 

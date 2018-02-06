@@ -2,10 +2,12 @@ package yanzhikai.simpleplayer;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,13 +33,16 @@ import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
 import yanzhikai.simpleplayer.event.ListSizeChangedEvent;
 import yanzhikai.simpleplayer.event.LocalListChangedEvent;
 import yanzhikai.simpleplayer.event.OpenAudioListEvent;
+import yanzhikai.simpleplayer.event.OpenClockEvent;
 import yanzhikai.simpleplayer.event.PlayListChangedEvent;
+import yanzhikai.simpleplayer.event.ShowClockEvent;
 import yanzhikai.simpleplayer.model.AudioInfo;
 import yanzhikai.simpleplayer.model.AudioListInfo;
 import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.service.AudioPlayerService;
 import yanzhikai.simpleplayer.ui.AlarmFragment;
 import yanzhikai.simpleplayer.ui.AudioListFragment;
+import yanzhikai.simpleplayer.ui.ClockFragment;
 import yanzhikai.simpleplayer.ui.LocalAudioListFragment;
 import yanzhikai.simpleplayer.ui.PlayListFragment;
 import yanzhikai.simpleplayer.ui.ShowListsFragment;
@@ -52,6 +57,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private static final String PLAY_LIST_FRAGMENT_NAME = "PlayList";
     private static final String SHOW_LIST_FRAGMENT_NAME = "ShowList";
     private static final String AUDIO_LIST_FRAGMENT_NAME = "AudioList";
+    private static final String CLOCK_FRAGMENT_NAME = "Clock";
     private static final String ALARM_FRAGMENT_NAME = "Alarm";
     private static final String LEFT_FRAGMENT_TAG = "LeftFragment";
     private static final String RIGHT_FRAGMENT_TAG = "RightFragment";
@@ -226,6 +232,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleOpenClock(OpenClockEvent openClockEvent){
+        loadLeftFragmentWithStack(ClockFragment.newInstance(),CLOCK_FRAGMENT_NAME);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleAudioStartPause(AudioStartPauseEvent startPauseEvent) {
         Log.d(TAG, "handleAudioStartPause: ");
         updateStartAndPause(startPauseEvent.getIsPause());
@@ -240,7 +251,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 ToastUtil.makeShortToast(this, "加入了除去列表中已经存在的歌曲");
                 Log.d(TAG, "handleAudioItemAdd: PlayListFragment failed");
             }
-            Log.d(TAG, "handleAudioItemAdd: PlayListFragment");
             EventUtil.post(new PlayListChangedEvent(PlayListChangedEvent.ITEM_ADDED));
         } else if (currentLeftFragment instanceof AudioListFragment) {
             if (!AudioListDaoManager.getInstance().
@@ -253,10 +263,16 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 Log.d(TAG, "handleAudioItemAdd: AudioListFragment failed");
             }
             EventUtil.post(new AudioListChangedEvent(AudioListChangedEvent.ITEM_ADDED));
-            Log.d(TAG, "handleAudioItemAdd: AudioListFragment");
         } else {
             ToastUtil.makeShortToast(this, "当前左边列表不可以加入歌曲");
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handlerClockShow(ShowClockEvent showClockEvent){
+        Log.d(TAG, "handlerClockShow: ");
+        showClockDialog(showClockEvent.msg);
+        ToastUtil.makeShortToast(this,showClockEvent.msg);
     }
 
     private void updateProgress(float progress) {
@@ -356,6 +372,19 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         Log.d(TAG, "testAudioList:result " + audioInfos.size());
 //        ToastUtil.makeShortToast(this,audioInfos.get(0).getSongName());
 
+    }
+
+    private void showClockDialog(String msg){
+        AlertDialog.Builder saveDialogBuilder = new AlertDialog.Builder(this);
+        saveDialogBuilder
+                .setTitle(msg)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .setCancelable(false)
+                .show();
     }
 
 
