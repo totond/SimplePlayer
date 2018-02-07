@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -158,6 +159,7 @@ public class AudioListFragment extends Fragment implements View.OnClickListener 
                 break;
             case R.id.tv_cover:
                 PlayList.getInstance().clear();
+                EventUtil.post(new AudioEvent(AudioEvent.AUDIO_NULL));
                 PlayList.getInstance().add(mAudioListAdapter.getAudioInfos());
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 for (int i = fragmentManager.getBackStackEntryCount(); i > 0 ; i--){

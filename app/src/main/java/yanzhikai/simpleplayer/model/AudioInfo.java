@@ -21,7 +21,6 @@ import com.jian.greendao.gen.AudioInfoDao;
 @Entity(nameInDb = "AudioInfo")
 public class AudioInfo implements Serializable {
 
-    public static final String KEY = "com.zlm.hp.ai.key";
 
     private static final long serialVersionUID = 42L;
 

@@ -67,6 +67,10 @@ public class ClockItemLayout extends RelativeLayout {
         }
     }
 
+    public void setSwitchClickable(boolean clickable){
+        sw.setClickable(clickable);
+    }
+
     public Switch getSwitch(){
         return sw;
     }

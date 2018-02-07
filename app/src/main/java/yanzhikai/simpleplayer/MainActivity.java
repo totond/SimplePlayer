@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -340,7 +341,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 break;
             case R.id.ly_local_btn:
                 openOrCloseRightFragment();
-
                 break;
             case R.id.ly_audios_btn:
                 openOrCloseRightFragment();
@@ -374,7 +374,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     }
 
-    private void showClockDialog(String msg){
+    public void showClockDialog(String msg){
         AlertDialog.Builder saveDialogBuilder = new AlertDialog.Builder(this);
         saveDialogBuilder
                 .setTitle(msg)
@@ -442,6 +442,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
+    public void popAllFragment(){
+        while (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+            Log.d(TAG, "popFragment: 0");
+            getSupportFragmentManager().popBackStack();
+        }
+    }
+
     public void loadLeftFragment(Fragment fragment) {
         Fragment newFragment = getSupportFragmentManager().findFragmentByTag(LEFT_FRAGMENT_TAG);
         if (newFragment != null) {
@@ -459,10 +466,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     }
 
     public void loadLeftFragmentWithStack(Fragment fragment, String name) {
-//        Fragment newFragment = getSupportFragmentManager().findFragmentByTag(LEFT_FRAGMENT_TAG);
-//        if (newFragment != null) {
-//            removeFragment(LEFT_FRAGMENT_TAG);
-//        }
+        Fragment newFragment = getSupportFragmentManager().findFragmentByTag(LEFT_FRAGMENT_TAG);
+        if (newFragment != null) {
+            getSupportFragmentManager().popBackStack(name, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
         FragmentTransaction transaction = getSupportFragmentManager()
                 .beginTransaction()
                 .setCustomAnimations(R.anim.silde_from_right,R.anim.slide_to_left, R.anim.silde_from_right,R.anim.slide_to_left)

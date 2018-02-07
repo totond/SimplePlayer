@@ -17,17 +17,22 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkTimedText;
 import yanzhikai.simpleplayer.AudioPlayerListener;
 import yanzhikai.simpleplayer.MainActivity;
+import yanzhikai.simpleplayer.MyApplication;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.SimpleAudioPlayer;
+import yanzhikai.simpleplayer.clock.ClockCountDownTimer;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;
 import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.event.AudioStartPauseEvent;
 import yanzhikai.simpleplayer.event.ClockPlayEvent;
+import yanzhikai.simpleplayer.event.ClockStopEvent;
+import yanzhikai.simpleplayer.event.ClockTimerEvent;
 import yanzhikai.simpleplayer.event.CurrentAudioDetailEvent;
 import yanzhikai.simpleplayer.event.PlayListChangedEvent;
 import yanzhikai.simpleplayer.event.ShowClockEvent;
@@ -69,6 +74,8 @@ public class AudioPlayerService extends Service {
     private RemoteViews mNotificationRemoteViews;
 
     private PlayerReceiver mPlayerReceiver;
+
+    private ClockCountDownTimer mClockCountDownTimer;
 
     public AudioPlayerService() {
     }
@@ -180,6 +187,7 @@ public class AudioPlayerService extends Service {
             mAudioPlayer.setPath(audioInfo.getFilePath());
             mAudioPlayer.prepareAsync();
 //        PlayList.getInstance().setCurrentAudio(audioInfo);
+            Log.d(TAG, "playNext: ");
             startPlayingThread();
             notifyAudioChanged();
             isPlaying = true;
@@ -271,10 +279,10 @@ public class AudioPlayerService extends Service {
         }
     }
 
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void handleClockEvent(ClockPlayEvent clockPlayEvent){
+        PlayList playList = PlayList.getInstance();
         if (clockPlayEvent.listName.equals(PLAY_LIST_NAME) ){
-            PlayList playList = PlayList.getInstance();
             if (playList.getAudioList().size() > 0){
                 playList.noMusic();
                 playStart();
@@ -287,12 +295,44 @@ public class AudioPlayerService extends Service {
             if (audioListInfo.getInfoList().size() > 0){
                 PlayList.getInstance().clear();
                 PlayList.getInstance().add(audioListInfo.getInfoList());
+                playList.noMusic();
                 playStart();
                 EventUtil.post(new ShowClockEvent(getString(R.string.clock_msg_ring,clockPlayEvent.listName)));
             }else {
                 EventUtil.post(new ShowClockEvent(getString(R.string.clock_msg_no_music,clockPlayEvent.listName)));
             }
 
+        }
+    }
+
+    @Subscribe
+    public void handleClockTimer(ClockTimerEvent clockTimerEvent){
+        switch (clockTimerEvent.type){
+            case ClockTimerEvent.TIMER_START:
+                if (mClockCountDownTimer != null){
+                    mClockCountDownTimer.cancel();
+                }
+                mClockCountDownTimer = new ClockCountDownTimer(clockTimerEvent.duration,clockTimerEvent.interval);
+                mClockCountDownTimer.start();
+                MyApplication.countDowning = true;
+                break;
+            case ClockTimerEvent.TIMER_STOP:
+                if (mClockCountDownTimer != null){
+                    mClockCountDownTimer.cancel();
+                    MyApplication.countDowning = false;
+                }
+                break;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void handleClockStop(ClockStopEvent clockStopEvent) {
+        switch (clockStopEvent.type) {
+            case ClockStopEvent.CLOCK_TICK:
+                break;
+            case ClockStopEvent.CLOCK_FINISH:
+                playPause();
+                break;
         }
     }
 

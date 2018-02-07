@@ -82,9 +82,12 @@ public class PlayList {
     }
 
     public boolean remove(AudioInfo info) {
-        if (isExist(info)) {
-            PlayListAudioDaoManager.getInstance().deleteAudio(info);
-            return mAudioList.remove(info);
+        if (PlayListAudioDaoManager.getInstance().deleteAudio(info)) {
+            mAudioList.remove(info);
+            if (PlayListAudioDaoManager.getInstance().queryPlayingAudio().get(0).getHash().equals(info.getAudioHash())){
+                return true;
+            }
+            return false;
         }
         return false;
     }
@@ -100,7 +103,7 @@ public class PlayList {
     public void clear() {
         mAudioList.clear();
         PlayListAudioDaoManager.getInstance().deleteAll();
-        EventBus.getDefault().post(new AudioEvent(AudioEvent.AUDIO_NULL));
+
     }
 
     public void noMusic(){

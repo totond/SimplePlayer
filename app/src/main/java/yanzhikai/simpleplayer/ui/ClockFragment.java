@@ -145,6 +145,7 @@ public class ClockFragment extends Fragment implements View.OnClickListener {
                 .setSubmitText(getString(R.string.yes))
                 .setCancelText(getString(R.string.no))
                 .setContentTextSize(26)
+                .setSelectOptions(checkIndex(mOptionsList.indexOf(mAlarmInfo.getRepeat())))
                 .isDialog(true)
                 .build();
         opv_repeat.setPicker(mOptionsList);
@@ -160,6 +161,7 @@ public class ClockFragment extends Fragment implements View.OnClickListener {
                 .setSubmitText(getString(R.string.yes))
                 .setCancelText(getString(R.string.no))
                 .setContentTextSize(26)
+                .setSelectOptions(checkIndex(mAudiosList.indexOf(mAlarmInfo.getAudioList())))
                 .isDialog(true)
                 .build();
         opv_audios.setPicker(mAudiosList);
@@ -167,6 +169,14 @@ public class ClockFragment extends Fragment implements View.OnClickListener {
         cl_play_time.setContentText(mAlarmInfo.getTime());
         cl_play_date.setContentText(mAlarmInfo.getRepeat());
         cl_play_audios.setContentText(mAlarmInfo.getAudioList());
+    }
+
+    //防止返回-1造成崩溃
+    private int checkIndex(int index){
+        if (index < 0){
+            return 0;
+        }
+        return index;
     }
 
     @Override

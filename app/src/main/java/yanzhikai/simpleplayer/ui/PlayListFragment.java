@@ -32,6 +32,7 @@ import yanzhikai.simpleplayer.model.PlayList;
 import yanzhikai.simpleplayer.utils.EventUtil;
 import yanzhikai.simpleplayer.utils.ToastUtil;
 
+import static yanzhikai.simpleplayer.event.AudioEvent.AUDIO_NULL;
 import static yanzhikai.simpleplayer.event.AudioEvent.AUDIO_PLAY_CHOSEN;
 
 /**
@@ -110,6 +111,9 @@ public class PlayListFragment extends Fragment implements View.OnClickListener{
                 boolean flag = true;
                 for (AudioInfo audioInfo : deleteList) {
                     flag &= PlayList.getInstance().remove(audioInfo);
+                }
+                if (flag) {
+                    EventUtil.post(new AudioEvent(AUDIO_NULL));
                 }
                 mPlayListAdapter.clearSelected();
                 mPlayListAdapter.notifyDataSetChanged();

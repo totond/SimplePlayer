@@ -208,12 +208,13 @@ public class PlayListAudioDaoManager {
     }
 
     public boolean isExist(String hash){
-        QueryBuilder<AudioInfo> queryBuilder = getDaoSession().queryBuilder(AudioInfo.class);
-        if(queryBuilder.where(AudioInfoDao.Properties.AudioHash.eq(hash)).list().size() > 0){
-            return true;
-        }else {
-            return false;
-        }
+//        QueryBuilder<AudioInfo> queryBuilder = getDaoSession().queryBuilder(AudioInfo.class);
+//        if(queryBuilder.where(AudioInfoDao.Properties.AudioHash.eq(hash)).list().size() > 0){
+//            return true;
+//        }else {
+//            return false;
+//        }
+        return (getDaoSession().getAudioInfoDao().load(hash) != null);
     }
 
     public boolean setPlayingAudio(PlayingAudioInfo playingInfo){

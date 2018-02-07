@@ -20,6 +20,7 @@ import yanzhikai.simpleplayer.service.AudioPlayerService;
 public class MyApplication extends Application {
     public static final String PLAY_LIST_NAME = "播放列表";
 
+    public static boolean countDowning = false;
 
     @Override
     public void onCreate() {

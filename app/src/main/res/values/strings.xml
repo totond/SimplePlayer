@@ -51,6 +51,7 @@
 
     <string name="clock_msg_ring">设定时间已到，现在为您播放歌单：%1$s</string>
     <string name="clock_msg_no_music">设定时间已到，但是歌单："%1$s" 没有音乐</string>
+    <string name="clock_timer_finish">倒计时结束，停止播放音乐</string>
 
 
 </resources>
