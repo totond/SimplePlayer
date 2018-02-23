@@ -1,7 +1,6 @@
 package yanzhikai.simpleplayer.ui;
 
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,9 +19,6 @@ import android.widget.TextView;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.List;
-
-import yanzhikai.simpleplayer.MainActivity;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.adapter.BaseOnItemClickListener;
 import yanzhikai.simpleplayer.adapter.ShowListAdapter;

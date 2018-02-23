@@ -7,6 +7,8 @@ import java.io.IOException;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
+import yanzhikai.simpleplayer.base.BaseAudioPlayerListener;
+
 /**
  * author : yany
  * e-mail : yanzhikai_yjk@qq.com
@@ -19,7 +21,7 @@ public class SimpleAudioPlayer {
 
     private IMediaPlayer mMediaPlayer = null;
 
-    private AudioPlayerListener mListener;
+    private BaseAudioPlayerListener mListener;
 
     private Context mContext;
 
@@ -148,7 +150,7 @@ public class SimpleAudioPlayer {
         this.mPath = path;
     }
 
-    public void setAudioListener(AudioPlayerListener listener) {
+    public void setAudioListener(BaseAudioPlayerListener listener) {
         this.mListener = listener;
     }
 }

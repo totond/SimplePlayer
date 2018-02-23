@@ -8,14 +8,12 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bigkoo.pickerview.OptionsPickerView;
 import com.bigkoo.pickerview.TimePickerView;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,20 +21,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import yanzhikai.simpleplayer.MainActivity;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;
-import yanzhikai.simpleplayer.event.OpenClockEvent;
 import yanzhikai.simpleplayer.model.AlarmInfo;
 import yanzhikai.simpleplayer.model.AudioListInfo;
 import yanzhikai.simpleplayer.ui.view.ClockItemLayout;
-import yanzhikai.simpleplayer.utils.EventUtil;
 import yanzhikai.simpleplayer.utils.ToastUtil;
 
 import static yanzhikai.simpleplayer.model.AlarmInfo.EVERY;
 import static yanzhikai.simpleplayer.model.AlarmInfo.ONCE;
-import static yanzhikai.simpleplayer.model.AlarmInfo.WEEKEND;
-import static yanzhikai.simpleplayer.model.AlarmInfo.WORKDAY;
 
 /**
  * A simple {@link Fragment} subclass.

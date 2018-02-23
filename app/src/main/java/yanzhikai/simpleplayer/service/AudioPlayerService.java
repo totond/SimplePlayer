@@ -5,12 +5,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.IBinder;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -21,8 +19,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkTimedText;
-import yanzhikai.simpleplayer.AudioPlayerListener;
-import yanzhikai.simpleplayer.MainActivity;
+import yanzhikai.simpleplayer.base.BaseAudioPlayerListener;
+import yanzhikai.simpleplayer.ui.MainActivity;
 import yanzhikai.simpleplayer.MyApplication;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.SimpleAudioPlayer;
@@ -135,7 +133,7 @@ public class AudioPlayerService extends Service {
 
     private void init() {
         mAudioPlayer = new SimpleAudioPlayer(getApplicationContext());
-        mAudioPlayer.setAudioListener(new MyAudioPlayerListener());
+        mAudioPlayer.setAudioListener(new MyBaseAudioPlayerListener());
         EventBus.getDefault().register(this);
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_PLAY_PAUSE);
@@ -394,7 +392,7 @@ public class AudioPlayerService extends Service {
         }
     }
 
-    private class MyAudioPlayerListener implements AudioPlayerListener {
+    private class MyBaseAudioPlayerListener implements BaseAudioPlayerListener {
 
         @Override
         public void onNewPlayer() {

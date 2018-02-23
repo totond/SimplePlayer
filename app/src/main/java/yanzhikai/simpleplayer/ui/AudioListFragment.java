@@ -15,16 +15,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
-import yanzhikai.simpleplayer.MainActivity;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.adapter.AudioListAdapter;
-import yanzhikai.simpleplayer.adapter.PlayListAdapter;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;
 import yanzhikai.simpleplayer.event.AudioEvent;
 import yanzhikai.simpleplayer.event.AudioListChangedEvent;

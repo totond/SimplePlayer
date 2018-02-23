@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import yanzhikai.simpleplayer.MainActivity;
 import yanzhikai.simpleplayer.MyApplication;
 import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;

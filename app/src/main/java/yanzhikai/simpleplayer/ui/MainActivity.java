@@ -1,4 +1,4 @@
-package yanzhikai.simpleplayer;
+package yanzhikai.simpleplayer.ui;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
@@ -24,6 +24,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
+import yanzhikai.simpleplayer.MyApplication;
+import yanzhikai.simpleplayer.R;
 import yanzhikai.simpleplayer.base.BaseAnimatorListener;
 import yanzhikai.simpleplayer.db.AudioListDaoManager;
 import yanzhikai.simpleplayer.event.AudioEvent;
